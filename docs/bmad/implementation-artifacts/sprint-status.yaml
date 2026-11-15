@@ -42,8 +42,8 @@ development_status:
   epic-1-retrospective: optional
 
   epic-2: in-progress
-  2-1-autenticación-y-endurecimiento-http: review
-  2-2-registrar-listar-y-ver-accidentes-con-aislamiento-por-propie: backlog
+  2-1-autenticación-y-endurecimiento-http: done
+  2-2-registrar-listar-y-ver-accidentes-con-aislamiento-por-propie: in-progress
   2-3-cambio-de-estado-por-revisor-con-concurrencia: backlog
   epic-2-retrospective: optional
 
