@@ -70,3 +70,23 @@ describe('loadEnv', () => {
     },
   );
 });
+
+describe('loadEnv en producción', () => {
+  const ejemplo = 'reemplazar-por-32-caracteres-aleatorios-xx';
+
+  it('rechaza el JWT_SECRET de ejemplo sin imprimirlo', () => {
+    let mensaje = '';
+    try {
+      loadEnv({ ...valido, NODE_ENV: 'production', JWT_SECRET: ejemplo });
+    } catch (e) {
+      mensaje = (e as Error).message;
+    }
+    expect(mensaje).toMatch(/JWT_SECRET/);
+    expect(mensaje).not.toContain(ejemplo);
+  });
+
+  it('acepta el valor de ejemplo fuera de producción y un secreto propio en producción', () => {
+    expect(() => loadEnv({ ...valido, NODE_ENV: 'development', JWT_SECRET: ejemplo })).not.toThrow();
+    expect(() => loadEnv({ ...valido, NODE_ENV: 'production' })).not.toThrow();
+  });
+});

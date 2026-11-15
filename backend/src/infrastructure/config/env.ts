@@ -26,6 +26,8 @@ const esquema = z.object({
     .default('development'),
 });
 
+const JWT_SECRET_EJEMPLO = 'reemplazar-por-32-caracteres-aleatorios-xx';
+
 export type Env = z.infer<typeof esquema>;
 
 export class ConfigError extends Error {
@@ -43,7 +45,12 @@ export function loadEnv(source: Record<string, string | undefined> = process.env
     if (valor !== undefined && valor !== '') entrada[clave] = valor;
   }
   const resultado = esquema.safeParse(entrada);
-  if (resultado.success) return resultado.data;
+  if (resultado.success) {
+    if (resultado.data.NODE_ENV === 'production' && resultado.data.JWT_SECRET === JWT_SECRET_EJEMPLO) {
+      throw new ConfigError('Configuración inválida:\n - JWT_SECRET: no puede ser el valor de ejemplo en producción');
+    }
+    return resultado.data;
+  }
   const detalles = [...new Set(resultado.error.issues.map((i) => i.message))];
   throw new ConfigError(`Configuración inválida:\n - ${detalles.join('\n - ')}`);
 }
