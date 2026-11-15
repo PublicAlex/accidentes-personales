@@ -1,0 +1,34 @@
+# 2026-11-15 seed:reviewer
+--- 1) con la contraseña de ejemplo (.env actual)
+> accidentes-personales@0.1.0 seed:reviewer
+> node --env-file-if-exists=.env backend/dist/main/seedReviewer.js
+
+No se pudo sembrar el Revisor: REVIEWER_PASSWORD usa el valor de ejemplo; define una contraseña propia.
+exit=1
+ count 
+-------
+     0
+(1 row)
+
+--- 2) credenciales validas, corrida 1
+> node --env-file-if-exists=.env backend/dist/main/seedReviewer.js
+
+Revisor listo: revisor@example.test
+exit=0
+--- 3) corrida 2 (idempotencia)
+> node --env-file-if-exists=.env backend/dist/main/seedReviewer.js
+
+Revisor listo: revisor@example.test
+exit=0
+        email         |   role   | hash_prefix | len 
+----------------------+----------+-------------+-----
+ revisor@example.test | REVIEWER | $2b$12$     |  60
+(1 row)
+
+ filas 
+-------
+     1
+(1 row)
+
+--- limpieza
+DELETE 1

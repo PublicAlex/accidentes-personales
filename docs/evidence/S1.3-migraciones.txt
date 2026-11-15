@@ -1,0 +1,99 @@
+# S1.3 migraciones 2026-11-15
+ Container carpetasinttulo-db-1  Running
+db Up 4 minutes (healthy)
+--- migrate down (todas) / up en BD principal
+./.env: línea 17: Demo: orden no encontrada
+> node --env-file-if-exists=.env node_modules/node-pg-migrate/bin/node-pg-migrate.js up -m backend/migrations
+
+No migrations to run!
+Migrations complete!
+DELETE FROM "public"."pgmigrations" WHERE name='1763230000000_initial-schema';
+
+
+Migrations complete!
+             List of relations
+ Schema |     Name     | Type  |   Owner    
+--------+--------------+-------+------------
+ public | pgmigrations | table | accidentes
+(1 row)
+
+INSERT INTO "public"."pgmigrations" (name, run_on) VALUES ('1763230000000_initial-schema', NOW());
+
+
+Migrations complete!
+                                Table "public.users"
+    Column     |           Type           | Collation | Nullable |      Default      
+---------------+--------------------------+-----------+----------+-------------------
+ id            | uuid                     |           | not null | gen_random_uuid()
+ email         | text                     |           | not null | 
+ password_hash | text                     |           | not null | 
+ full_name     | text                     |           | not null | 
+ role          | text                     |           | not null | 'USER'::text
+ created_at    | timestamp with time zone |           | not null | now()
+Indexes:
+    "users_pkey" PRIMARY KEY, btree (id)
+    "users_email_lower_uq" UNIQUE, btree (lower(email))
+Check constraints:
+    "users_email_check" CHECK (email = lower(email))
+    "users_full_name_check" CHECK (char_length(full_name) >= 3 AND char_length(full_name) <= 120)
+    "users_role_check" CHECK (role = ANY (ARRAY['USER'::text, 'REVIEWER'::text]))
+Referenced by:
+    TABLE "accidents" CONSTRAINT "accidents_owner_id_fkey" FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE RESTRICT
+    TABLE "accidents" CONSTRAINT "accidents_status_changed_by_fkey" FOREIGN KEY (status_changed_by) REFERENCES users(id)
+    TABLE "revoked_tokens" CONSTRAINT "revoked_tokens_user_id_fkey" FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+
+                                 Table "public.accidents"
+      Column       |           Type           | Collation | Nullable |      Default       
+-------------------+--------------------------+-----------+----------+--------------------
+ id                | uuid                     |           | not null | gen_random_uuid()
+ owner_id          | uuid                     |           | not null | 
+ affected_name     | text                     |           | not null | 
+ document_type     | text                     |           | not null | 
+ document_number   | text                     |           | not null | 
+ phone             | text                     |           | not null | 
+ contact_email     | text                     |           | not null | 
+ accident_type     | text                     |           | not null | 
+ occurred_on       | date                     |           | not null | 
+ place             | text                     |           | not null | 
+ description       | text                     |           | not null | 
+ status            | text                     |           | not null | 'REGISTRADO'::text
+ status_changed_by | uuid                     |           |          | 
+ status_changed_at | timestamp with time zone |           |          | 
+ created_at        | timestamp with time zone |           | not null | now()
+ updated_at        | timestamp with time zone |           | not null | now()
+Indexes:
+    "accidents_pkey" PRIMARY KEY, btree (id)
+    "accidents_owner_occurred_idx" btree (owner_id, occurred_on DESC, created_at DESC)
+Check constraints:
+    "accidents_accident_type_check" CHECK (accident_type = ANY (ARRAY['TRANSITO'::text, 'LABORAL'::text, 'DOMESTICO'::text, 'DEPORTIVO'::text, 'OTRO'::text]))
+    "accidents_affected_name_check" CHECK (char_length(affected_name) >= 3 AND char_length(affected_name) <= 120)
+    "accidents_check" CHECK ((status_changed_by IS NULL) = (status_changed_at IS NULL))
+    "accidents_contact_email_check" CHECK (char_length(contact_email) <= 254)
+    "accidents_description_check" CHECK (char_length(description) >= 20 AND char_length(description) <= 2000)
+    "accidents_document_number_check" CHECK (document_number ~ '^[A-Za-z0-9]{5,20}$'::text)
+    "accidents_document_type_check" CHECK (document_type = ANY (ARRAY['CC'::text, 'CE'::text, 'TI'::text, 'PASAPORTE'::text]))
+    "accidents_occurred_on_check" CHECK (occurred_on >= '1900-01-01'::date)
+    "accidents_phone_check" CHECK (phone ~ '^\+?[0-9]{7,15}$'::text)
+    "accidents_place_check" CHECK (char_length(place) >= 3 AND char_length(place) <= 200)
+    "accidents_status_check" CHECK (status = ANY (ARRAY['REGISTRADO'::text, 'EN_REVISION'::text, 'CERRADO'::text]))
+Foreign-key constraints:
+    "accidents_owner_id_fkey" FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE RESTRICT
+    "accidents_status_changed_by_fkey" FOREIGN KEY (status_changed_by) REFERENCES users(id)
+
+                     Table "public.revoked_tokens"
+   Column   |           Type           | Collation | Nullable | Default 
+------------+--------------------------+-----------+----------+---------
+ jti        | uuid                     |           | not null | 
+ user_id    | uuid                     |           | not null | 
+ expires_at | timestamp with time zone |           | not null | 
+ revoked_at | timestamp with time zone |           | not null | now()
+Indexes:
+    "revoked_tokens_pkey" PRIMARY KEY, btree (jti)
+    "revoked_tokens_expires_idx" btree (expires_at)
+Foreign-key constraints:
+    "revoked_tokens_user_id_fkey" FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+
+--- migrate:test
+
+No migrations to run!
+Migrations complete!
