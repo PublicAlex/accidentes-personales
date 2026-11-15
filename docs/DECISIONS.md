@@ -120,3 +120,14 @@ Origen: `docs/bmad/planning-artifacts/architecture/architecture-accidentes-perso
   - TypeScript 5.9, porque dependency-cruiser exige una versión menor a 7.
   - El registro no inicia sesión automáticamente.
   - La "fecha no futura" se evalúa en `America/Bogota`.
+
+### DEC-018 — Revisión humana de S1.1: allowlist de gitleaks y CI
+- Fecha: 2026-11-15
+- Tipo: corrección sobre el código del agente.
+- Hallazgos:
+  1. El agente puso en el allowlist de gitleaks archivos completos (el spine y el manifiesto de BMAD). Eso podría ocultar secretos que se agreguen después a esos archivos.
+  2. El commit `ci:` dice incluir gitleaks, pero el workflow no lo ejecutaba.
+- Corrección:
+  1. El allowlist queda limitado a `.env.example`. Los 2 falsos positivos se verificaron a mano (valores ficticios documentados y un hash SHA-256 de integridad) y se ignoran por fingerprint en `.gitleaksignore`.
+  2. Se agregó al CI el job `secretos`, que corre gitleaks sobre el historial completo (`fetch-depth: 0`).
+- Verificación: `gitleaks detect` sobre 9 commits dio "no leaks found".
