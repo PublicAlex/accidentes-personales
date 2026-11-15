@@ -1,0 +1,6 @@
+# 2026-11-15  $ npm run build -w backend
+
+> backend@0.1.0 build
+> tsc -p tsconfig.build.json
+
+# exit: 0
