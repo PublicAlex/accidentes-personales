@@ -1,0 +1,30 @@
+# Confidencial: enunciado de la prueba (no publicar)
+MAESTRO_PRUEBA_TECNICA.md
+*.pdf
+
+# Secretos
+.env
+.env.*
+!.env.example
+
+# Dependencias y builds
+node_modules/
+dist/
+build/
+coverage/
+
+# Logs
+*.log
+npm-debug.log*
+
+# BMAD: overrides personales (no se versionan)
+_bmad/config.user.toml
+_bmad/custom/*.user.toml
+
+# Claude Code: settings locales
+.claude/settings.local.json
+
+# SO / editor
+.DS_Store
+.vscode/
+.idea/
