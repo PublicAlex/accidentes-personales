@@ -1,0 +1,29 @@
+{
+  "name": "accidentes-personales",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Registro de accidentes personales (monorepo backend + frontend)",
+  "workspaces": ["backend", "frontend"],
+  "engines": { "node": ">=24" },
+  "scripts": {
+    "build": "npm run build -w frontend && npm run build -w backend",
+    "start": "node --env-file-if-exists=.env backend/dist/main/server.js",
+    "migrate": "node --env-file-if-exists=.env node_modules/node-pg-migrate/bin/node-pg-migrate.js up -m backend/migrations",
+    "migrate:test": "node --env-file-if-exists=.env node_modules/node-pg-migrate/bin/node-pg-migrate.js up -m backend/migrations -d TEST_DATABASE_URL",
+    "migrate:create": "node --env-file-if-exists=.env node_modules/node-pg-migrate/bin/node-pg-migrate.js create -j sql -m backend/migrations",
+    "seed:reviewer": "node --env-file-if-exists=.env backend/dist/main/seedReviewer.js",
+    "test": "npm test -w backend && npm test -w frontend",
+    "lint:arch": "depcruise backend/src --config .dependency-cruiser.cjs && node scripts/check-globals.mjs",
+    "scan:secrets": "node scripts/scan-secrets.mjs",
+    "dev": "npm run dev:backend & npm run dev:frontend & wait",
+    "dev:backend": "node --env-file-if-exists=.env node_modules/tsx/dist/cli.mjs watch backend/src/main/server.ts",
+    "dev:frontend": "npm run dev -w frontend"
+  },
+  "devDependencies": {
+    "@types/node": "24.19.2",
+    "dependency-cruiser": "18.7.2",
+    "tsx": "4.23.15",
+    "typescript": "5.9.3",
+    "vitest": "5.1.0"
+  }
+}
