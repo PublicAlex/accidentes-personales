@@ -1,0 +1,11 @@
+# S1.1 evidencia: env-failfast
+# fecha: 2026-11-15T18:22:53-05:00
+# comando: bash -c env -u JWT_SECRET -u DATABASE_URL node backend/dist/main/server.js
+Configuración inválida:
+ - DATABASE_URL: variable obligatoria no definida
+ - JWT_SECRET: variable obligatoria no definida
+ - FRONTEND_ORIGIN: variable obligatoria no definida
+ - REVIEWER_EMAIL: variable obligatoria no definida
+ - REVIEWER_PASSWORD: variable obligatoria no definida
+ - REVIEWER_FULL_NAME: variable obligatoria no definida
+# exit: 1
