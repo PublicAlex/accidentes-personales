@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<!--
+  PRD Validation Report — skeleton template.
+
+  This file is a starter the synthesis pass fills in directly. There is no
+  substitution engine. The LLM:
+    1. Reads {doc_workspace}/review-rubric.md and every review-{slug}.md from
+       additional reviewers.
+    2. Copies this skeleton.
+    3. Replaces the placeholder content (everything between TEMPLATE markers)
+       with the consolidated review, preserving the structure and CSS.
+    4. Writes the result to {doc_workspace}/validation-report.html.
+    5. Writes a markdown twin to {doc_workspace}/validation-report.md.
+
+  Visual rules the LLM must preserve:
+    - The container width, the color tokens, the typography.
+    - One dimension = one collapsible <section class="dimension">.
+    - Verdict pill uses the verdict-* class matching its judgment.
+    - Severity badge uses the sev-* class matching its level.
+    - Each extra reviewer (adversarial, etc.) gets its own collapsible section
+      below the rubric dimensions.
+    - The footer always shows the artifact paths and timestamp.
+-->
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>PRD Validation: Plataforma de accidentes personales (MVP)</title>
+<style>
+  :root {
+    --bg: #fafaf9;
+    --surface: #ffffff;
+    --border: #e7e5e4;
+    --text: #1c1917;
+    --muted: #78716c;
+
+    --verdict-strong: #16a34a;
+    --verdict-adequate: #65a30d;
+    --verdict-thin: #d97706;
+    --verdict-broken: #dc2626;
+
+    --sev-low: #64748b;
+    --sev-medium: #ca8a04;
+    --sev-high: #ea580c;
+    --sev-critical: #dc2626;
+
+    --grade-exc: #16a34a;
+    --grade-good: #65a30d;
+    --grade-fair: #d97706;
+    --grade-poor: #dc2626;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    font-size: 15px;
+  }
+  .container { max-width: 960px; margin: 0 auto; padding: 32px 24px 64px; }
+
+  header.report-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 24px;
+  }
+  .title h1 { margin: 0; font-size: 22px; font-weight: 600; letter-spacing: -0.01em; }
+  .title .subtitle { color: var(--muted); font-size: 13px; margin-top: 4px; font-family: ui-monospace, "SF Mono", Menlo, monospace; }
+  .grade {
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-weight: 600;
+    color: white;
+    font-size: 15px;
+    white-space: nowrap;
+  }
+  .grade-excellent { background: var(--grade-exc); }
+  .grade-good { background: var(--grade-good); }
+  .grade-fair { background: var(--grade-fair); }
+  .grade-poor { background: var(--grade-poor); }
+
+  .synthesis {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--muted);
+    border-radius: 8px;
+    padding: 18px 22px;
+    margin-bottom: 24px;
+    font-size: 15.5px;
+  }
+  .synthesis p { margin: 0 0 10px; }
+  .synthesis p:last-child { margin-bottom: 0; }
+
+  .dimension-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+  .dim-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+  }
+  .dim-card .dim-name { font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+  .dim-card .dim-verdict { font-size: 14px; font-weight: 600; }
+
+  section.dimension, section.reviewer-section { margin-bottom: 14px; }
+  section.dimension details, section.reviewer-section details {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  section summary {
+    padding: 14px 20px;
+    cursor: pointer;
+    user-select: none;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  section summary::-webkit-details-marker { display: none; }
+  section summary::before {
+    content: "▸";
+    display: inline-block;
+    color: var(--muted);
+    transition: transform 0.15s ease;
+  }
+  section details[open] summary::before { transform: rotate(90deg); }
+  section summary h2 {
+    display: inline;
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: -0.005em;
+    flex: 1;
+  }
+  .verdict-pill {
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: white;
+  }
+  .verdict-strong { background: var(--verdict-strong); }
+  .verdict-adequate { background: var(--verdict-adequate); }
+  .verdict-thin { background: var(--verdict-thin); }
+  .verdict-broken { background: var(--verdict-broken); }
+
+  .dim-body { padding: 4px 20px 18px; }
+  .dim-judgment { color: var(--text); font-size: 14.5px; }
+  .dim-judgment p { margin: 0 0 10px; }
+
+  .findings-list { padding: 0 20px 4px; }
+  article.finding {
+    padding: 14px 0;
+    border-top: 1px solid var(--border);
+  }
+  article.finding:first-child { border-top: none; }
+  article.finding header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 6px;
+  }
+  .badge {
+    font-size: 10.5px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    line-height: 1.4;
+  }
+  .badge-sev-low { background: rgba(100, 116, 139, 0.12); color: var(--sev-low); }
+  .badge-sev-medium { background: rgba(202, 138, 4, 0.14); color: var(--sev-medium); }
+  .badge-sev-high { background: rgba(234, 88, 12, 0.14); color: var(--sev-high); }
+  .badge-sev-critical { background: rgba(220, 38, 38, 0.14); color: var(--sev-critical); }
+  .finding-title { margin: 0; font-size: 15px; font-weight: 500; flex: 1; min-width: 200px; }
+  .finding-location { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 12.5px; color: var(--muted); }
+  .finding-note, .finding-fix { margin-top: 6px; font-size: 14px; }
+  .finding-fix strong { color: var(--muted); font-weight: 500; }
+
+  .reviewer-source {
+    font-size: 12px;
+    color: var(--muted);
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  }
+
+  .mechanical {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-top: 24px;
+    font-size: 14px;
+  }
+  .mechanical h3 { margin: 0 0 10px; font-size: 14px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+  .mechanical ul { margin: 0; padding-left: 20px; }
+  .mechanical li { margin-bottom: 4px; color: var(--text); }
+
+  footer.report-footer {
+    margin-top: 40px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--muted);
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  }
+  footer .meta { display: flex; gap: 24px; flex-wrap: wrap; }
+</style>
+</head>
+<body><div class="container">
+<header class="report-header"><div class="title"><h1>Plataforma de accidentes personales (MVP) — Informe de validación</h1><div class="subtitle">docs/bmad/planning-artifacts/prds/prd-accidentes-personales-2026-11-15/prd.md</div></div><div class="grade grade-poor">Poor</div></header>
+<div class="synthesis"><p>El PRD es compacto y con sustancia real: NFR con umbrales verificables (NFR-03, NFR-08), nueve criterios de aceptación Dado/Cuando/Entonces y fuera de alcance explícito. El riesgo principal es que quedó desfasado respecto de DEC-005..DEC-008: FR-03 exige una invalidación de sesión que JWT no cumple sin `jti`, FR-10 y la sección 8 siguen abiertos aunque ya están resueltos, y NFR-07 declara &quot;no obligatorias&quot; medidas que DEC-008 hizo obligatorias. Mientras no se integren, arquitectura e historias recibirían dos fuentes en conflicto.</p><p>La revisión adversarial agrava el cuadro: veredicto NO APTO para pasar a arquitectura. Aparecen contradicciones internas que existen aunque se ignoren las decisiones: NFR-03 (todo filtrado por owner_id) frente al rol REVIEWER que debe tocar accidentes ajenos, escalada de privilegios por `role` en el registro, alternativas &quot;ignora o rechaza&quot; que impiden pruebas deterministas, orden 400/401/403/404 sin definir y más de la mitad de los FR sin AC. Nota de recuento: el rubro cuenta 19 hallazgos y el adversarial 39; varios coinciden (logout, FR-10, límites, AC faltantes).</p></div>
+<div class="dimension-summary">
+<div class="dim-card"><div class="dim-name">Decision-readiness</div><div class="dim-verdict" style="color: var(--verdict-thin)">thin</div></div>
+<div class="dim-card"><div class="dim-name">Substance over theater</div><div class="dim-verdict" style="color: var(--verdict-adequate)">adequate</div></div>
+<div class="dim-card"><div class="dim-name">Strategic coherence</div><div class="dim-verdict" style="color: var(--verdict-adequate)">adequate</div></div>
+<div class="dim-card"><div class="dim-name">Done-ness clarity</div><div class="dim-verdict" style="color: var(--verdict-thin)">thin</div></div>
+<div class="dim-card"><div class="dim-name">Scope honesty</div><div class="dim-verdict" style="color: var(--verdict-adequate)">adequate</div></div>
+<div class="dim-card"><div class="dim-name">Downstream usability</div><div class="dim-verdict" style="color: var(--verdict-adequate)">adequate</div></div>
+<div class="dim-card"><div class="dim-name">Shape fit</div><div class="dim-verdict" style="color: var(--verdict-adequate)">adequate</div></div>
+</div>
+<section class="dimension"><details open><summary><h2>Decision-readiness</h2><span class="verdict-pill verdict-thin">thin</span></summary><div class="dim-body"><div class="dim-judgment"><p>La sección 8 ya no es una lista de preguntas abiertas: las cuatro están resueltas (1→DEC-006, 3→DEC-007, 4→DEC-008, 2→DEC-001). Un lector que solo abra `prd.md` creerá que hay bloqueos inexistentes y no sabrá los valores acordados. No se nombran trade-offs (404 vs 403, REVIEWER vs panel admin, bcrypt &quot;o argon2&quot;).</p></div></div><div class="findings-list"><article class="finding"><header><span class="badge badge-sev-high">high</span><h3 class="finding-title">Sección 8 obsoleta frente a DEC-005..008</h3><span class="finding-location">§8</span></header><div class="finding-note">Las cuatro preguntas abiertas ya tienen respuesta y el PRD las presenta como bloqueos.</div><div class="finding-fix"><strong>Fix:</strong> Retirar las resueltas, incorporar los valores como requisitos (FR-05, FR-10, NFR-07) y dejar nota de trazabilidad a DEC-005..008.</div></article><article class="finding"><header><span class="badge badge-sev-high">high</span><h3 class="finding-title">Mecanismo de sesión sin decidir</h3><span class="finding-location">NFR-04, NFR-07, §8</span></header><div class="finding-note">NFR-04 dice &quot;token o sesión validados&quot;; §8 habla de cookie httpOnly; DEC-005 fija JWT en cookie httpOnly, sameSite=lax, 1 h, jti.</div><div class="finding-fix"><strong>Fix:</strong> Una sola formulación en NFR-04 y glosario.</div></article><article class="finding"><header><span class="badge badge-sev-medium">medium</span><h3 class="finding-title">Decisión firme listada como supuesto</h3><span class="finding-location">§8 (404 idéntico)</span></header><div class="finding-note">FR-08 y NFR-03 ya lo fijan como requisito y criterio eliminatorio.</div><div class="finding-fix"><strong>Fix:</strong> Quitarlo de supuestos.</div></article><article class="finding"><header><span class="badge badge-sev-medium">medium</span><h3 class="finding-title">Trade-offs ausentes</h3><span class="finding-location">NFR-02, NFR-03, FR-10</span></header><div class="finding-note">No se dice qué se pierde con 404 frente a 403 ni por qué un único rol REVIEWER.</div><div class="finding-fix"><strong>Fix:</strong> Una línea de motivo por decisión.</div></article></div></details></section>
+<section class="dimension"><details><summary><h2>Substance over theater</h2><span class="verdict-pill verdict-adequate">adequate</span></summary><div class="dim-body"><div class="dim-judgment"><p>Es sustancia, no ornamento: la visión es específica y los NFR centrales llevan método de verificación (NFR-03, NFR-08 con dependency-cruiser, AC-7 con gitleaks). Los NFR blandos (NFR-07, NFR-10) carecen de criterio de prueba.</p></div></div><div class="findings-list"><article class="finding"><header><span class="badge badge-sev-medium">medium</span><h3 class="finding-title">NFR-07 mezcla requisito y supuesto</h3><span class="finding-location">NFR-07</span></header><div class="finding-note">Su `[ASSUMPTION: ... no obligatorias]` contradice DEC-008 (helmet, CORS a FRONTEND_ORIGIN con credentials, rate limit 10/15 min/IP).</div><div class="finding-fix"><strong>Fix:</strong> Convertir en requisitos con umbrales y añadir AC.</div></article><article class="finding"><header><span class="badge badge-sev-low">low</span><h3 class="finding-title">NFR-10 es proceso, no producto</h3><span class="finding-location">NFR-10</span></header><div class="finding-note">No es verificable por un test del sistema.</div><div class="finding-fix"><strong>Fix:</strong> Moverlo a Propósito o a criterios de entrega.</div></article></div></details></section>
+<section class="dimension"><details><summary><h2>Strategic coherence</h2><span class="verdict-pill verdict-adequate">adequate</span></summary><div class="dim-body"><div class="dim-judgment"><p>La tesis está en §1 (persistencia, autorización en servidor, hexagonal) y el alcance la sirve. FR-10 &quot;opcional&quot; debilita a FR-09: una regla de transición que nadie puede ejecutar no es demostrable (DEC-006 la justifica por el cambio en vivo).</p></div></div><div class="findings-list"><article class="finding"><header><span class="badge badge-sev-high">high</span><h3 class="finding-title">FR-10 opcional contradice la tesis y DEC-006</h3><span class="finding-location">FR-10, §2, §8-1</span></header><div class="finding-note">DEC-006 define users.role (USER/REVIEWER), semilla por variables de entorno y que el dueño solo ve el estado.</div><div class="finding-fix"><strong>Fix:</strong> Reescribir FR-10 como obligatorio, 403 para USER, y añadir AC.</div></article><article class="finding"><header><span class="badge badge-sev-low">low</span><h3 class="finding-title">Éxito registrado como supuesto</h3><span class="finding-location">§1, §8</span></header><div class="finding-note">Es una definición, no una inferencia.</div><div class="finding-fix"><strong>Fix:</strong> Declararlo como definición (y ver H-08 adversarial).</div></article></div></details></section>
+<section class="dimension"><details open><summary><h2>Done-ness clarity</h2><span class="verdict-pill verdict-thin">thin</span></summary><div class="dim-body"><div class="dim-judgment"><p>Mitad de los FR con consecuencias comprobables, pero con huecos serios: límites de FR-05 &quot;a definir en arquitectura&quot; (DEC-007 los fija), FR-02 sin política de contraseña, FR-03 incumplible con JWT stateless, alternativas &quot;rechazan o ignoran&quot; y &quot;400 o campo ignorado&quot;. FR-01, 02, 03, 04, 06 y 10 sin AC.</p></div></div><div class="findings-list"><article class="finding"><header><span class="badge badge-sev-critical">critical</span><h3 class="finding-title">FR-03 exige invalidación de servidor imposible con JWT sin revocación</h3><span class="finding-location">FR-03</span></header><div class="finding-note">&quot;el servidor deja de aceptarla&quot; no se cumple con token stateless. DEC-005: jti + revoked_tokens + TokenRevocationRepository, ausentes del PRD.</div><div class="finding-fix"><strong>Fix:</strong> Integrar DEC-005 y añadir AC: tras logout, la misma cookie devuelve 401.</div></article><article class="finding"><header><span class="badge badge-sev-high">high</span><h3 class="finding-title">Límites de FR-05 sin valores aunque están decididos</h3><span class="finding-location">FR-05, FR-02, §8-3</span></header><div class="finding-note">DEC-007: descripción 20-2000, lugar 3-200, doc CC/CE/TI/PASAPORTE, número 5-20, teléfono 7-15, contraseña mínimo 8.</div><div class="finding-fix"><strong>Fix:</strong> Volcar la tabla de DEC-007 y convertir supuestos en requisitos.</div></article><article class="finding"><header><span class="badge badge-sev-high">high</span><h3 class="finding-title">Falta AC para FR-10, logout y listado privado</h3><span class="finding-location">§6</span></header><div class="finding-note">Seis FR sin AC y NFR-03 sin prueba sobre el listado.</div><div class="finding-fix"><strong>Fix:</strong> AC para logout, REVIEWER vs USER (403), transición por API y listado aislado.</div></article><article class="finding"><header><span class="badge badge-sev-medium">medium</span><h3 class="finding-title">Alternativas abiertas en comportamiento esperado</h3><span class="finding-location">FR-05, AC-4</span></header><div class="finding-note">&quot;se rechazan o ignoran&quot; impide un test único.</div><div class="finding-fix"><strong>Fix:</strong> Elegir una conducta (Zod strict con 400).</div></article><article class="finding"><header><span class="badge badge-sev-medium">medium</span><h3 class="finding-title">Frases sin umbral</h3><span class="finding-location">FR-05, FR-02</span></header><div class="finding-note">&quot;comprensibles&quot;; &quot;error sin revelar datos adicionales&quot; sin código.</div><div class="finding-fix"><strong>Fix:</strong> Especificar código y mensajes por campo.</div></article><article class="finding"><header><span class="badge badge-sev-medium">medium</span><h3 class="finding-title">NFR-02 sin costo</h3><span class="finding-location">NFR-02</span></header><div class="finding-note">&quot;bcrypt (o argon2)&quot; sin parámetros; DEC-008 fija bcrypt 12 rounds.</div><div class="finding-fix"><strong>Fix:</strong> &quot;bcrypt con 12 rounds&quot;.</div></article><article class="finding"><header><span class="badge badge-sev-low">low</span><h3 class="finding-title">FR-09 con 4xx sin código</h3><span class="finding-location">FR-09</span></header><div class="finding-note">Inverificable.</div><div class="finding-fix"><strong>Fix:</strong> Fijar 409 o 422.</div></article></div></details></section>
+<section class="dimension"><details><summary><h2>Scope honesty</h2><span class="verdict-pill verdict-adequate">adequate</span></summary><div class="dim-body"><div class="dim-judgment"><p>La sección 7 es explícita y honesta; el problema es de higiene: 14 elementos abiertos para 11 FR, etiquetas y índice sin correspondencia, sin `[NOTE FOR PM]` ni `[NON-GOAL for MVP]`. DEC-005..008 cierran la mayoría.</p></div></div><div class="findings-list"><article class="finding"><header><span class="badge badge-sev-medium">medium</span><h3 class="finding-title">Roundtrip de supuestos roto</h3><span class="finding-location">§2, FR-10, NFR-07 vs §8</span></header><div class="finding-note">Supuestos inline no indexados e indexados no inline.</div><div class="finding-fix"><strong>Fix:</strong> Tras integrar decisiones, eliminar etiquetas resueltas y reindexar.</div></article><article class="finding"><header><span class="badge badge-sev-low">low</span><h3 class="finding-title">Omisión silenciosa de refresh/renovación</h3><span class="finding-location">§7</span></header><div class="finding-note">Con expiración de 1 h el usuario se desconecta y no está declarado.</div><div class="finding-fix"><strong>Fix:</strong> Añadir `[NON-GOAL for MVP]`.</div></article></div></details></section>
+<section class="dimension"><details><summary><h2>Downstream usability</h2><span class="verdict-pill verdict-adequate">adequate</span></summary><div class="dim-body"><div class="dim-judgment"><p>IDs FR/NFR/AC contiguos y referencias que resuelven. Glosario incompleto (falta Revisor, Sesión) y deriva owner/owner_id/ownerId/user_id.</p></div></div><div class="findings-list"><article class="finding"><header><span class="badge badge-sev-medium">medium</span><h3 class="finding-title">Glosario incompleto y deriva de nombres</h3><span class="finding-location">§3, FR-05, FR-11, NFR-03</span></header><div class="finding-note">Revisor y Sesión sin definir; owner/owner_id/user_id solapados.</div><div class="finding-fix"><strong>Fix:</strong> Añadir términos y fijar owner_id.</div></article><article class="finding"><header><span class="badge badge-sev-low">low</span><h3 class="finding-title">Ambigüedad &quot;afectado&quot; vs &quot;Usuario&quot;</h3><span class="finding-location">FR-05, §2</span></header><div class="finding-note">No queda claro si se registra por terceros.</div><div class="finding-fix"><strong>Fix:</strong> Aclarar.</div></article></div></details></section>
+<section class="dimension"><details><summary><h2>Shape fit</h2><span class="verdict-pill verdict-adequate">adequate</span></summary><div class="dim-body"><div class="dim-judgment"><p>Capability spec con un flujo central, sin UJ: formato correcto para una prueba técnica de un operador. Greenfield. Un flujo/tabla rol-permiso para REVIEWER aportaría más que un UJ.</p></div></div><div class="findings-list"></div></details></section>
+<section class="reviewer-section"><details><summary><h2>Revisión adversarial (incluye desincronización con DEC-005..008)</h2><span class="reviewer-source">docs/bmad/planning-artifacts/prds/prd-accidentes-personales-2026-11-15/review-adversarial-general.md</span></summary><div class="dim-body"><div class="dim-judgment"><p>Veredicto: NO APTO para arquitectura e historias tal como está. Las tablas de contradicciones línea por línea con DEC-005..008 están en el archivo fuente.</p></div></div><div class="findings-list"><article class="finding"><header><span class="badge badge-sev-critical">critical</span><h3 class="finding-title">C-01 Logout inverificable</h3><span class="finding-location">FR-03, NFR-04, NFR-05</span></header><div class="finding-note">Imposible con JWT stateless; con cookie httpOnly el borrado solo lo hace el servidor con Set-Cookie. Reusar el JWT copiado tras logout daría 200.</div><div class="finding-fix"><strong>Fix:</strong> Reescribir FR-03 con DEC-005, AC-10 de token reusado = 401 y fail-closed si falla la consulta a revoked_tokens.</div></article><article class="finding"><header><span class="badge badge-sev-critical">critical</span><h3 class="finding-title">C-02 Contradicción de autorización con REVIEWER</h3><span class="finding-location">NFR-03, FR-10, §1, §2 No usuarios, §7</span></header><div class="finding-note">NFR-03 (&quot;toda consulta filtra por id y owner_id&quot;) y la visión chocan con un REVIEWER que cambia estado de accidentes ajenos; &quot;No usuarios&quot; excluye administradores con acceso a terceros.</div><div class="finding-fix"><strong>Fix:</strong> Excepción exacta: único acceso cross-owner = PATCH de estado para REVIEWER; definir qué lee el REVIEWER; corregir §2 y §7.</div></article><article class="finding"><header><span class="badge badge-sev-critical">critical</span><h3 class="finding-title">C-03 Escalada de privilegios por `role` en registro</h3><span class="finding-location">FR-02, FR-04, NFR-04</span></header><div class="finding-note">Mass assignment de role no cubierto; role en JWT persiste hasta 1 h.</div><div class="finding-fix"><strong>Fix:</strong> Registro siempre USER, role en body = 400, rol leído de BD o desfase aceptado; AC nuevo.</div></article><article class="finding"><header><span class="badge badge-sev-high">high</span><h3 class="finding-title">H-01 Cero AC para FR-10/rol</h3><span class="finding-location">FR-10, §6</span></header><div class="finding-note">Transiciones solo probadas por unidad (AC-8).</div><div class="finding-fix"><strong>Fix:</strong> ACs: USER=403, REVIEWER avanza, salto=4xx, sin sesión=401, dueño ve estado.</div></article><article class="finding"><header><span class="badge badge-sev-high">high</span><h3 class="finding-title">H-02 &quot;ignora o rechaza&quot; sin contrato</h3><span class="finding-location">FR-05, AC-4</span></header><div class="finding-note">Dos comportamientos y un AC que acepta ambos.</div><div class="finding-fix"><strong>Fix:</strong> Zod strict, 400 para cualquier campo desconocido; partir AC-4.</div></article><article class="finding"><header><span class="badge badge-sev-high">high</span><h3 class="finding-title">H-03 Enumeración de usuarios y email sin normalizar</h3><span class="finding-location">FR-02, FR-03</span></header><div class="finding-note">Email duplicado es oráculo; rate limit solo en login; A@x.com y a@x.com distintos; oráculo temporal en login.</div><div class="finding-fix"><strong>Fix:</strong> Decidir 409 + rate limit en /register, bcrypt contra hash ficticio, normalizar email.</div></article><article class="finding"><header><span class="badge badge-sev-high">high</span><h3 class="finding-title">H-04 Orden 400/401/403/404/409 sin definir</h3><span class="finding-location">FR-08, NFR-03, NFR-05, FR-10</span></header><div class="finding-note">Id malformado puede dar 500 (22P02); PATCH ajeno de USER ambiguo.</div><div class="finding-fix"><strong>Fix:</strong> Orden normativo y mismo 404 para id malformado/inexistente.</div></article><article class="finding"><header><span class="badge badge-sev-high">high</span><h3 class="finding-title">H-05 &quot;4xx&quot; inverificable y concurrencia</h3><span class="finding-location">FR-09, FR-10</span></header><div class="finding-note">400/409/422 pasan; sin definir estado igual ni concurrencia.</div><div class="finding-fix"><strong>Fix:</strong> Código fijo y UPDATE ... WHERE status = esperado.</div></article><article class="finding"><header><span class="badge badge-sev-high">high</span><h3 class="finding-title">H-06 CHECK de estado vs añadir estado sin tocar capas</h3><span class="finding-location">FR-11, FR-09</span></header><div class="finding-note">Un CHECK obliga a migración en la prueba en vivo.</div><div class="finding-fix"><strong>Fix:</strong> Redefinir criterio o usar tabla de estados con FK.</div></article><article class="finding"><header><span class="badge badge-sev-high">high</span><h3 class="finding-title">H-07 Más de la mitad de FR/NFR sin AC</h3><span class="finding-location">§6</span></header><div class="finding-note">FR-01..04, 06, 10, NFR-06, 07, 10 sin AC.</div><div class="finding-fix"><strong>Fix:</strong> Añadir ACs o bajar alcance explícitamente.</div></article><article class="finding"><header><span class="badge badge-sev-high">high</span><h3 class="finding-title">H-08 Éxito = solo 9 escenarios</h3><span class="finding-location">§1, §8</span></header><div class="finding-note">Contradice NFR-08/10 y DEC-008 (15 pts); la lista de eliminatorios omite NFR-02.</div><div class="finding-fix"><strong>Fix:</strong> Eliminar el supuesto y alinear con la rúbrica.</div></article><article class="finding"><header><span class="badge badge-sev-high">high</span><h3 class="finding-title">H-09 Sin máximo de contraseña</h3><span class="finding-location">FR-02, NFR-02</span></header><div class="finding-note">bcrypt trunca en 72 bytes y permite DoS.</div><div class="finding-fix"><strong>Fix:</strong> Máximo 72 bytes y 12 rounds explícitos.</div></article><article class="finding"><header><span class="badge badge-sev-high">high</span><h3 class="finding-title">H-10 Superficie del token ambigua</h3><span class="finding-location">NFR-04, glosario</span></header><div class="finding-note">&quot;token o sesión&quot; admite Bearer y localStorage.</div><div class="finding-fix"><strong>Fix:</strong> JWT solo en cookie httpOnly, ignorar Authorization, fijar alg.</div></article><article class="finding"><header><span class="badge badge-sev-high">high</span><h3 class="finding-title">H-11 Rate limit y CORS no verificables</h3><span class="finding-location">NFR-07, NFR-06</span></header><div class="finding-note">Sin 429/Retry-After, trust proxy ni FRONTEND_ORIGIN en NFR-06.</div><div class="finding-fix"><strong>Fix:</strong> Especificar y añadir variables y ACs.</div></article><article class="finding"><header><span class="badge badge-sev-medium">medium</span><h3 class="finding-title">M-01 &quot;mensajes genéricos&quot; vs &quot;400 con detalle&quot;</h3><span class="finding-location">NFR-07, FR-05</span></header><div class="finding-note">Contradicción aparente.</div><div class="finding-fix"><strong>Fix:</strong> Definir contrato de error {campo, código}; 5xx genéricos.</div></article><article class="finding"><header><span class="badge badge-sev-medium">medium</span><h3 class="finding-title">M-02 Fecha futura: CHECK y zona horaria</h3><span class="finding-location">FR-05, FR-11</span></header><div class="finding-note">CHECK con CURRENT_DATE no inmutable; falta zona y cota inferior.</div><div class="finding-fix"><strong>Fix:</strong> Validar en dominio con Clock inyectado.</div></article><article class="finding"><header><span class="badge badge-sev-medium">medium</span><h3 class="finding-title">M-03 Tipo de id sin definir</h3><span class="finding-location">FR-08, FR-11</span></header><div class="finding-note">Ids secuenciales facilitan enumeración.</div><div class="finding-fix"><strong>Fix:</strong> uuid obligatorio.</div></article><article class="finding"><header><span class="badge badge-sev-medium">medium</span><h3 class="finding-title">M-04 Listado sin campos, orden ni límite</h3><span class="finding-location">FR-07</span></header><div class="finding-note">Falta id, tipo, orden, paginación.</div><div class="finding-fix"><strong>Fix:</strong> Definir campos mínimos y límite.</div></article><article class="finding"><header><span class="badge badge-sev-medium">medium</span><h3 class="finding-title">M-05 AC-2 sin endpoint ni casos de token</h3><span class="finding-location">AC-2, NFR-05</span></header><div class="finding-note">No cubre expirado, manipulado o revocado.</div><div class="finding-fix"><strong>Fix:</strong> Tabla de endpoints con auth/rol/códigos.</div></article><article class="finding"><header><span class="badge badge-sev-medium">medium</span><h3 class="finding-title">M-06 AC-4 agrupa cinco casos</h3><span class="finding-location">AC-4</span></header><div class="finding-note">Un fallo pasa desapercibido.</div><div class="finding-fix"><strong>Fix:</strong> Una fila por caso.</div></article><article class="finding"><header><span class="badge badge-sev-medium">medium</span><h3 class="finding-title">M-07 &quot;contenedor&quot; sin requisito de Docker</h3><span class="finding-location">AC-6</span></header><div class="finding-note">Volumen efímero haría fallar el AC.</div><div class="finding-fix"><strong>Fix:</strong> Exigir compose con volumen nombrado.</div></article><article class="finding"><header><span class="badge badge-sev-medium">medium</span><h3 class="finding-title">M-08 AC-7 manual y sin patrones</h3><span class="finding-location">AC-7</span></header><div class="finding-note">&quot;revisión de respuestas&quot; sin alcance.</div><div class="finding-fix"><strong>Fix:</strong> Patrones concretos y test automatizado.</div></article><article class="finding"><header><span class="badge badge-sev-medium">medium</span><h3 class="finding-title">M-09 AC-8 sin matriz; CI no definido</h3><span class="finding-location">AC-8, NFR-08</span></header><div class="finding-note">No enumera casos ni define CI.</div><div class="finding-fix"><strong>Fix:</strong> Matriz de transiciones y script lint:arch.</div></article><article class="finding"><header><span class="badge badge-sev-medium">medium</span><h3 class="finding-title">M-10 README sin contenido mínimo</h3><span class="finding-location">FR-06, AC-9, NFR-09</span></header><div class="finding-note">Prerrequisitos indefinidos.</div><div class="finding-fix"><strong>Fix:</strong> Checklist del README.</div></article><article class="finding"><header><span class="badge badge-sev-medium">medium</span><h3 class="finding-title">M-11 &quot;decisiones ya cerradas&quot; falso</h3><span class="finding-location">§0, NFR-08</span></header><div class="finding-note">Solo Express (DEC-004) tiene DEC.</div><div class="finding-fix"><strong>Fix:</strong> Crear DEC faltantes o retirar la afirmación.</div></article><article class="finding"><header><span class="badge badge-sev-medium">medium</span><h3 class="finding-title">M-12 Tipos de accidente siguen abiertos</h3><span class="finding-location">FR-05, §8-3</span></header><div class="finding-note">DEC-007 no cierra el conjunto.</div><div class="finding-fix"><strong>Fix:</strong> Promover a DEC.</div></article><article class="finding"><header><span class="badge badge-sev-medium">medium</span><h3 class="finding-title">M-13 Sin política de PII en logs ni semilla débil</h3><span class="finding-location">NFR-07, NFR-01</span></header><div class="finding-note">Logs pueden filtrar documento/teléfono/descripción.</div><div class="finding-fix"><strong>Fix:</strong> Logs sin PII; semilla falla con contraseña de ejemplo.</div></article><article class="finding"><header><span class="badge badge-sev-medium">medium</span><h3 class="finding-title">M-14 Sin auditoría de cambio de estado</h3><span class="finding-location">FR-09, FR-10</span></header><div class="finding-note">Quién y cuándo.</div><div class="finding-fix"><strong>Fix:</strong> status_changed_by/at o fuera de alcance.</div></article><article class="finding"><header><span class="badge badge-sev-medium">medium</span><h3 class="finding-title">M-15 Detalles de revocación sin especificar</h3><span class="finding-location">FR-03</span></header><div class="finding-note">Limpieza, índice jti, logout con token expirado, latencia.</div><div class="finding-fix"><strong>Fix:</strong> Criterios en FR-03.</div></article><article class="finding"><header><span class="badge badge-sev-medium">medium</span><h3 class="finding-title">M-16 sameSite=lax + CORS: topología</h3><span class="finding-location">DEC-005</span></header><div class="finding-note">Funciona solo mismo sitio; secure solo en prod.</div><div class="finding-fix"><strong>Fix:</strong> Documentar topología y CSRF.</div></article><article class="finding"><header><span class="badge badge-sev-low">low</span><h3 class="finding-title">L-01..L-09 (FR-01 subjetivo, FR-05 mensajes, errata &quot;probables&quot; en NFR-08, NFR-10 conducta, FR-04 sin forma, frontmatter sin cambio, §7 cambio de rol, límite de body, historial gitleaks)</h3><span class="finding-location">varios</span></header><div class="finding-note">Ver detalle en review-adversarial-general.md.</div><div class="finding-fix"><strong>Fix:</strong> Ver archivo de revisión.</div></article></div></details></section>
+<div class="mechanical"><h3>Notas mecánicas</h3><ul><li>Contradicciones PRD vs DECISIONS.md (DEC-005..008): FR-03 sin jti/revoked_tokens/1 h/cookie; FR-10, §2 y glosario sin rol REVIEWER, semilla ni 403 al dueño; FR-02/FR-05 sin límites y formatos de DEC-007; NFR-07 marca como no obligatorio lo que DEC-008 hace obligatorio; NFR-02 sin bcrypt 12 rounds; NFR-04 &quot;token o sesión&quot;; NFR-06 sin FRONTEND_ORIGIN, secreto JWT ni credenciales de semilla; FR-11 sin users.role ni revoked_tokens; NFR-08 sin puerto TokenRevocationRepository; §8 con las 4 preguntas ya resueltas; frontmatter sin versión/changelog.</li><li>Falta en DEC-005..008: tipos de accidente (DEC-007 no los cierra) y DEC para PostgreSQL 16, React/Vite/TS, Zod y dependency-cruiser que el PRD llama &quot;ya cerradas&quot;.</li><li>IDs FR-01..11, NFR-01..10, AC-1..9 contiguos y únicos; referencias cruzadas resuelven. FR sin AC: FR-01, 02, 03, 04, 06, 10.</li><li>Roundtrip de supuestos roto (inline vs §8). Sin UJ ni SM: aceptable para este tipo de PRD. Errata: &quot;probables&quot; por &quot;probadas&quot; en NFR-08.</li></ul></div>
+<footer class="report-footer"><div class="meta"><span>Rubric: .claude/skills/bmad-prd/assets/prd-validation-checklist.md</span><span>Generated: 2026-11-15T18:05:00-05:00</span></div></footer></div></body></html>
