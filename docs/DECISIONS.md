@@ -59,3 +59,64 @@ Origen: `docs/bmad/planning-artifacts/prds/prd-accidentes-personales-2026-11-15/
 - Tipo: nota de proceso.
 - Contexto: las skills BMAD se instalaron con esta sesión ya abierta, así que la herramienta Skill no las reconoció.
 - Decisión: el agente leyó y siguió el `SKILL.md` directamente. En sesiones nuevas de Claude Code las skills cargan normalmente.
+
+## Revisión de la validación BMAD del PRD (2026-11-15)
+Origen: `validation-report.md`, con calificación *Poor*: 3 hallazgos críticos, 12 altos, 20 medios y 11 bajos.
+
+### DEC-010 — Rol nunca desde el cliente ni guardado en el token (hallazgo crítico 3)
+- Tipo: corrección de seguridad.
+- Decisión:
+  - El registro siempre crea usuarios con rol `USER`. Si el body trae `role` o cualquier campo desconocido, la petición se rechaza con 400 (esquemas Zod `.strict()`).
+  - El JWT solo lleva `sub` (id del usuario) y `jti`.
+  - En cada petición, el middleware de auth carga el usuario desde el repositorio para saber su rol actual. Así un rol cambiado nunca queda "congelado" en un token viejo.
+
+### DEC-011 — Alcance del rol REVIEWER frente al aislamiento por dueño (hallazgo crítico 2)
+- Tipo: aclaración.
+- Decisión:
+  - NFR-03 aplica a todas las lecturas: `GET /api/accidents` y `GET /api/accidents/:id` filtran siempre por el usuario del token, también para un REVIEWER.
+  - El REVIEWER solo puede usar `PATCH /api/accidents/:id/status` sobre cualquier accidente, y la respuesta trae solo `{id, status, updatedAt}`, sin datos personales.
+  - Si un USER llama al PATCH, recibe 403. Ese 403 no revela si el accidente existe, porque el chequeo de rol ocurre antes de buscarlo.
+
+### DEC-012 — Contrato HTTP sin ambigüedades (hallazgo alto 7)
+- Tipo: decisión técnica.
+- Decisión:
+  - Orden de evaluación: autenticación (401) → rol (403) → validación (400) → recurso (404) → regla de dominio (409).
+  - Un campo desconocido o un `userId`/`ownerId` en el body se rechaza con 400.
+  - Una transición de estado inválida devuelve 409 Conflict.
+  - Un email duplicado en el registro devuelve 409 con mensaje genérico. Se acepta como riesgo del MVP; se mitiga con rate limit en `/api/auth/register` y `/api/auth/login`.
+  - Formato único de error: `{ error: { code, message, details? } }`.
+
+### DEC-013 — CHECK de estado frente a extensibilidad (hallazgo alto 9)
+- Tipo: aclaración.
+- Decisión: se mantiene el `CHECK` en la BD, porque es una restricción de integridad que pide el enunciado. "Centralizado" significa que la lista de estados y sus transiciones viven en un único módulo del dominio. Agregar un estado = dominio + una migración que reemplaza el CHECK + la etiqueta en la UI + tests. FR-09 se reescribe así.
+
+### DEC-014 — Stack y catálogos cerrados (hallazgo medio 10)
+- Tipo: decisión técnica.
+- Decisión:
+  - PostgreSQL 16 (imagen Docker `postgres:16`) y React 18 + Vite + TypeScript, como recomienda el enunciado.
+  - Tipos de accidente: `TRANSITO`, `LABORAL`, `DOMESTICO`, `DEPORTIVO`, `OTRO`.
+  - Cada FR/NFR tendrá al menos un criterio de aceptación verificable (hallazgo alto 8). Incluye criterios para logout, roles, rate limit y hardening.
+
+## Revisión humana de la arquitectura (2026-11-15)
+Origen: `docs/bmad/planning-artifacts/architecture/architecture-accidentes-personales-2026-11-15/ARCHITECTURE-SPINE.md`, generado por el agente Architect (Opus) y revisado por 3 sub-revisores de BMAD.
+
+### DEC-015 — Cookie `secure` configurable por entorno
+- Tipo: aclaración de DEC-005.
+- Decisión: la cookie usa `secure` según la variable `COOKIE_SECURE`.
+  - En `.env.example` vale `false`, para que el arranque desde build funcione en `http://localhost` (prueba 9).
+  - Un despliegue real con HTTPS debe ponerla en `true`.
+  - El backend registra un aviso al arrancar si `NODE_ENV=production` y `COOKIE_SECURE=false`.
+  - Se documenta en `LIMITATIONS.md`.
+
+### DEC-016 — Orden del arranque
+- Tipo: aclaración de NFR-09.
+- Decisión: el orden de NFR-09 no es normativo. El README sigue la secuencia instalar → levantar BD → migrar → compilar → sembrar revisor (el script corre desde `dist/`) → ejecutar.
+
+### DEC-017 — Versiones del stack
+- Tipo: verificación.
+- Decisión: las versiones fijadas en el spine se consultaron con `npm view` el 2026-11-15. La imagen `postgres:16` se verificó con `docker pull`.
+- Supuestos que se aceptan:
+  - Express 5.
+  - TypeScript 5.9, porque dependency-cruiser exige una versión menor a 7.
+  - El registro no inicia sesión automáticamente.
+  - La "fecha no futura" se evalúa en `America/Bogota`.
