@@ -1,0 +1,33 @@
+# S1.1 evidencia: tests (tras parches de revisión)
+# fecha: 2026-11-15T18:26:02-05:00
+# comando: npm test
+
+> accidentes-personales@0.1.0 test
+> npm test -w backend && npm test -w frontend
+
+
+> backend@0.1.0 test
+> vitest run
+
+
+ RUN  v5.1.0 /home/homie/Escritorio/desarrollo agentico/Carpeta sin título/backend
+
+
+ Test Files  3 passed (3)
+      Tests  20 passed (20)
+   Start at  18:26:07
+   Duration  7.73s (tests 97%, import 2%, transform 1%)
+
+
+> frontend@0.1.0 test
+> vitest run --passWithNoTests
+
+
+ RUN  v5.1.0 /home/homie/Escritorio/desarrollo agentico/Carpeta sin título/frontend
+
+No test files found, exiting with code 0
+
+include: **/*.{test,spec}.?(c|m)[jt]s?(x)
+exclude:  **/node_modules/**, **/.git/**
+
+# exit: 0

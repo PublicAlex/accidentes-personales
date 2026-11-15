@@ -1,0 +1,6 @@
+# S1.1 evidencia: vite-grep
+# fecha: 2026-11-15T18:22:53-05:00
+# comando: bash -c grep -c VITE_ .env.example; git check-ignore -v .env
+0
+.gitignore:6:.env	.env
+# exit: 0

@@ -1,0 +1,12 @@
+title = "accidentes-personales"
+
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Valores ficticios documentados"
+paths = [
+  '''^\.env\.example$''',
+]
+# Los falsos positivos puntuales (spine con valores ficticios, hashes del manifiesto BMAD)
+# se ignoran por fingerprint en .gitleaksignore, no por archivo completo (revisión humana S1.1).

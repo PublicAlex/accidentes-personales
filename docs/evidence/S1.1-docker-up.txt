@@ -1,0 +1,28 @@
+# S1.1 evidencia: docker-up
+# fecha: 2026-11-15T18:22:53-05:00
+# comando: bash -c docker compose up -d --wait db && docker compose exec -T db pg_isready && docker compose exec -T db psql -U accidentes -d accidentes -c "\l" && docker volume ls | grep pgdata
+ Network carpetasinttulo_default  Creating
+ Network carpetasinttulo_default  Created
+ Volume carpetasinttulo_pgdata  Creating
+ Volume carpetasinttulo_pgdata  Created
+ Container carpetasinttulo-db-1  Creating
+ Container carpetasinttulo-db-1  Created
+ Container carpetasinttulo-db-1  Starting
+ Container carpetasinttulo-db-1  Started
+ Container carpetasinttulo-db-1  Waiting
+ Container carpetasinttulo-db-1  Healthy
+/var/run/postgresql:5432 - accepting connections
+                                                            List of databases
+      Name       |   Owner    | Encoding | Locale Provider |  Collate   |   Ctype    | ICU Locale | ICU Rules |     Access privileges     
+-----------------+------------+----------+-----------------+------------+------------+------------+-----------+---------------------------
+ accidentes      | accidentes | UTF8     | libc            | en_US.utf8 | en_US.utf8 |            |           | 
+ accidentes_test | accidentes | UTF8     | libc            | en_US.utf8 | en_US.utf8 |            |           | 
+ postgres        | accidentes | UTF8     | libc            | en_US.utf8 | en_US.utf8 |            |           | 
+ template0       | accidentes | UTF8     | libc            | en_US.utf8 | en_US.utf8 |            |           | =c/accidentes            +
+                 |            |          |                 |            |            |            |           | accidentes=CTc/accidentes
+ template1       | accidentes | UTF8     | libc            | en_US.utf8 | en_US.utf8 |            |           | =c/accidentes            +
+                 |            |          |                 |            |            |            |           | accidentes=CTc/accidentes
+(5 rows)
+
+local     carpetasinttulo_pgdata
+# exit: 0

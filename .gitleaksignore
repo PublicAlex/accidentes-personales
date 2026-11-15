@@ -1,0 +1,5 @@
+# Falsos positivos revisados manualmente (2026-11-15):
+# - spine: línea que documenta los valores FICTICIOS de .env.example
+8caf21e5b81a698045ec63af0640892b523124d0:docs/bmad/planning-artifacts/architecture/architecture-accidentes-personales-2026-11-15/ARCHITECTURE-SPINE.md:generic-api-key:299
+# - manifiesto BMAD: hash sha256 de integridad de un archivo, no un secreto
+5e832c700cd9d5554c23245a789b92b4ab8bf079:_bmad/_config/files-manifest.csv:generic-api-key:48
