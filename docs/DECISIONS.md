@@ -96,3 +96,27 @@ Origen: `validation-report.md`, con calificación *Poor*: 3 hallazgos críticos,
   - PostgreSQL 16 (imagen Docker `postgres:16`) y React 18 + Vite + TypeScript, como recomienda el enunciado.
   - Tipos de accidente: `TRANSITO`, `LABORAL`, `DOMESTICO`, `DEPORTIVO`, `OTRO`.
   - Cada FR/NFR tendrá al menos un criterio de aceptación verificable (hallazgo alto 8). Incluye criterios para logout, roles, rate limit y hardening.
+
+## Revisión humana de la arquitectura (2026-11-15)
+Origen: `docs/bmad/planning-artifacts/architecture/architecture-accidentes-personales-2026-11-15/ARCHITECTURE-SPINE.md`, generado por el agente Architect (Opus) y revisado por 3 sub-revisores de BMAD.
+
+### DEC-015 — Cookie `secure` configurable por entorno
+- Tipo: aclaración de DEC-005.
+- Decisión: la cookie usa `secure` según la variable `COOKIE_SECURE`.
+  - En `.env.example` vale `false`, para que el arranque desde build funcione en `http://localhost` (prueba 9).
+  - Un despliegue real con HTTPS debe ponerla en `true`.
+  - El backend registra un aviso al arrancar si `NODE_ENV=production` y `COOKIE_SECURE=false`.
+  - Se documenta en `LIMITATIONS.md`.
+
+### DEC-016 — Orden del arranque
+- Tipo: aclaración de NFR-09.
+- Decisión: el orden de NFR-09 no es normativo. El README sigue la secuencia instalar → levantar BD → migrar → compilar → sembrar revisor (el script corre desde `dist/`) → ejecutar.
+
+### DEC-017 — Versiones del stack
+- Tipo: verificación.
+- Decisión: las versiones fijadas en el spine se consultaron con `npm view` el 2026-11-15. La imagen `postgres:16` se verificó con `docker pull`.
+- Supuestos que se aceptan:
+  - Express 5.
+  - TypeScript 5.9, porque dependency-cruiser exige una versión menor a 7.
+  - El registro no inicia sesión automáticamente.
+  - La "fecha no futura" se evalúa en `America/Bogota`.
