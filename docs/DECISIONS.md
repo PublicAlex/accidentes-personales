@@ -131,3 +131,10 @@ Origen: `docs/bmad/planning-artifacts/architecture/architecture-accidentes-perso
   1. El allowlist queda limitado a `.env.example`. Los 2 falsos positivos se verificaron a mano (valores ficticios documentados y un hash SHA-256 de integridad) y se ignoran por fingerprint en `.gitleaksignore`.
   2. Se agregó al CI el job `secretos`, que corre gitleaks sobre el historial completo (`fetch-depth: 0`).
 - Verificación: `gitleaks detect` sobre 9 commits dio "no leaks found".
+
+### DEC-019 — Revisión humana de S1.3: `upsertReviewer` sobre un email ya existente
+- Fecha: 2026-11-15
+- Tipo: riesgo aceptado.
+- Contexto: el agente dejó como diferido que la semilla del revisor promueve a `REVIEWER` a una cuenta USER que ya exista con ese email.
+- Análisis: el `ON CONFLICT` también reemplaza el `password_hash` con la credencial del entorno. Quien hubiera registrado antes ese email pierde el acceso y no hereda el rol, así que no hay escalada de privilegios.
+- Riesgo residual (aceptado en el MVP): los accidentes de esa cuenta previa quedan bajo la cuenta del revisor. Mitigación: usar un email de revisor que no esté expuesto al registro público. Se documenta en `LIMITATIONS.md`.
