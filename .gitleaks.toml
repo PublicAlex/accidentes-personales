@@ -1,0 +1,13 @@
+title = "accidentes-personales"
+
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Valores ficticios documentados"
+paths = [
+  '''^\.env\.example$''',
+  # Falsos positivos revisados: el spine documenta el .env.example ficticio; el manifiesto BMAD contiene hashes.
+  '''^docs/bmad/planning-artifacts/architecture/.*ARCHITECTURE-SPINE\.md$''',
+  '''^_bmad/_config/files-manifest\.csv$''',
+]
