@@ -1,0 +1,5 @@
+# 2026-11-15T18:56:39-05:00 busqueda de secretos en repo versionable
+backend/src/infrastructure/logging/PinoLogger.ts:5:const FIELDS = ['password', 'passwordHash', 'password_hash', 'token', 'email', 'contactEmail', 'affectedName', 'documentNumber', 'phone', 'description'];
+backend/src/infrastructure/persistence/pg/PgUserRepository.ts:16:const COLUMNS = 'id, email, password_hash, full_name, role, created_at';
+backend/src/infrastructure/persistence/pg/PgUserRepository.ts:69:           SET password_hash = EXCLUDED.password_hash, full_name = EXCLUDED.full_name, role = 'REVIEWER'
+(sin coincidencias del JWT_SECRET real si la lista anterior esta vacia)
