@@ -2,7 +2,7 @@
 title: 'S2.3 Cambio de estado por Revisor con concurrencia'
 type: 'feature'
 created: '2026-11-15'
-status: 'in-progress'
+status: 'done'
 baseline_revision: 'db6de6011a9bfeb160035d803b3b503d87c9da79'
 review_loop_iteration: 0
 followup_review_recommended: false
@@ -76,9 +76,37 @@ deferred: []
 
 ## Review Triage Log
 
+### 2026-11-15 — Review pass
+- verdicts: 20 findings — high 0, medium 1, low 4, false 15, maybe-false 0
+- findings:
+  - `[medium]` `[patch]` Blind/Edge/Intent: la prueba de concurrencia por HTTP puede pasar sin ejercitar el UPDATE condicional (el perdedor puede fallar por INVALID_TRANSITION) — parche: prueba de integración con `PgAccidentRepository` real y `findStatusById` con barrera que fuerza dos lecturas obsoletas; el perdedor recibe `ConflictError('CONCURRENT_UPDATE')` (verificada, 8 pruebas del archivo en verde).
+  - `[low]` `[reject]` Edge: reloj atrasado podría mover `updated_at` hacia atrás — instancia única en el MVP; el arreglo agrega estado y ramas.
+  - `[low]` `[reject]` Edge: fila borrada entre lectura y UPDATE daría 409 en lugar de 404 — no existe borrado de accidentes en el alcance.
+  - `[low]` `[reject]` Blind: sin historial de transiciones, solo último `status_changed_by/at` — el contrato (DEC-006, AD-4) define solo esas columnas.
+  - `[low]` `[reject]` Blind: tipos laxos (`status: string`) en DTO y retorno anónimo — cosmético sin daño demostrado.
+  - `[false]` `[reject]` Blind/Edge/Intent: spec lista `app.ts` sin cambio en el diff — sus tipos derivan de `AccidentUseCases`; sin brecha funcional.
+  - `[false]` `[reject]` Blind/Intent: estado `in-progress` y logs vacíos — bookkeeping previo a esta revisión; se actualiza al finalizar.
+  - `[false]` `[reject]` Blind: pruebas unitarias "2 válidas y 7 inválidas" solo verifican arreglos propios — la tabla llama al caso de uso real y comprueba 200/409 por fila.
+  - `[false]` `[reject]` Blind: 409 sin estado actual / idempotencia / updatedAt ambiguo — contrato fijado por spine (`{id,status,updatedAt}`, 409 sin cuerpo extra).
+  - `[false]` `[reject]` Blind/Intent: rol "fresco de BD" sin prueba, JSON malformado, documentación — cubierto por `AuthenticateRequest` (S2.1) y `errorMapper`; documentación fuera de alcance.
+  - `[false]` `[reject]` Blind/Intent: evidencia con rutas absolutas, Pg no en el diff, AC ids en nombres — no son defectos de código; adaptador `Pg` probado en S1.3.
+  - `[false]` `[reject]` Gap: sin brechas — no aplica (3 filas restantes de capas agrupadas).
+
+
 ## Verification
 
 **Commands:** (prefijar cada comando Bash con `export PATH="$HOME/.local/bin:$PATH";`; no hacer commits ni tocar `.env`)
 - `npm run build` -- expected: exit 0
 - `npm run lint:arch` -- expected: exit 0
 - `npm test -w backend` -- expected: todo en verde
+
+## Auto Run Result
+
+Status: done
+
+- Resumen: `ChangeAccidentStatus` + `PATCH /api/accidents/:id/status` (authenticate -> requireRole REVIEWER -> jsonBody -> validate), respuesta `{id,status,updatedAt}`, UPDATE condicional con 409 por concurrencia.
+- Archivos: ver `git diff 80a8fe9..HEAD --stat` (caso de uso, esquema, presenter, controlador, ruta, container, pruebas unitarias e integración).
+- Revisión: 1 parche (medium: prueba determinista de la lectura obsoleta contra Pg), 0 diferidos, resto rechazado con razón.
+- Seguimiento recomendado: false (un solo parche medium, solo de prueba).
+- Verificación: build, lint:arch, tsc y `npm test -w backend` en verde (ver `docs/evidence/S2.3-*.txt`).
+- Riesgos residuales: ninguno nuevo.
