@@ -1,4 +1,6 @@
 // Fakes en memoria: solo para pruebas (AD-12).
+import { Accident } from '../../src/domain/accident/Accident.js';
+import type { AccidentRepository, AccidentSummary, UpdateStatusInput } from '../../src/application/ports/AccidentRepository.js';
 import { ConflictError } from '../../src/application/errors.js';
 import type { Clock } from '../../src/application/ports/Clock.js';
 import type { IdGenerator } from '../../src/application/ports/IdGenerator.js';
@@ -94,5 +96,59 @@ export class FakeTokenService implements TokenService {
     const e = Number(exp);
     if (e * 1000 <= this.clock.now().getTime()) return null;
     return { sub, jti, exp: e };
+  }
+}
+
+export class InMemoryAccidentRepository implements AccidentRepository {
+  readonly items = new Map<string, Accident>();
+  async create(accident: Accident) {
+    this.items.set(accident.id, accident);
+    return accident;
+  }
+  async listByOwner(ownerId: string, limit: number): Promise<AccidentSummary[]> {
+    return [...this.items.values()]
+      .filter((a) => a.ownerId === ownerId)
+      .sort(
+        (x, y) =>
+          y.occurredOn.localeCompare(x.occurredOn) ||
+          y.createdAt.getTime() - x.createdAt.getTime() ||
+          x.id.localeCompare(y.id),
+      )
+      .slice(0, limit)
+      .map((a) => ({ id: a.id, accidentType: a.accidentType, occurredOn: a.occurredOn, status: a.status }));
+  }
+  async findByIdForOwner(id: string, ownerId: string) {
+    const a = this.items.get(id);
+    return a && a.ownerId === ownerId ? a : null;
+  }
+  async findStatusById(id: string) {
+    const a = this.items.get(id);
+    return a ? { id: a.id, status: a.status } : null;
+  }
+  async updateStatus(input: UpdateStatusInput) {
+    const a = this.items.get(input.id);
+    if (!a || a.status !== input.expected) throw new ConflictError('CONCURRENT_UPDATE');
+    this.items.set(
+      a.id,
+      Accident.rehydrate({
+        id: a.id,
+        affectedName: a.affectedName,
+        documentType: a.documentType,
+        documentNumber: a.documentNumber,
+        phone: a.phone,
+        contactEmail: a.contactEmail,
+        accidentType: a.accidentType,
+        occurredOn: a.occurredOn,
+        place: a.place,
+        description: a.description,
+        ownerId: a.ownerId,
+        status: input.next,
+        statusChangedBy: input.by,
+        statusChangedAt: input.at,
+        createdAt: a.createdAt,
+        updatedAt: input.at,
+      }),
+    );
+    return { id: a.id, status: input.next, updatedAt: input.at };
   }
 }
