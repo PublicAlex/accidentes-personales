@@ -2,7 +2,7 @@
 title: 'S3.3 Build de producción, README y evidencia de entrega'
 type: 'feature'
 created: '2026-11-15'
-status: 'in-review'
+status: 'done'
 baseline_revision: '77d3b3b55d64f18acc58df9d4264ece4d8fc7776'
 review_loop_iteration: 0
 followup_review_recommended: false
@@ -71,6 +71,35 @@ deferred: []
 ## Spec Change Log
 
 ## Review Triage Log
+
+### 2026-11-15 — Review pass
+- verdicts: 16 filas (hallazgos de los revisores agrupados por tema) — high 0, medium 4, low 7, false 5, maybe-false 0
+- findings:
+  - `[medium]` `patch` README, api.md y architecture.md decían que todo lo no resuelto da 404 JSON, pero un GET fuera de /api con dist devuelve index.html (Edge Case, Blind) — documentación corregida a lo que hace el código.
+  - `[medium]` `patch` verify-persistence.sh: `read` aborta sin TTY, la espera tras reiniciar la BD no falla por timeout y el "OK" podía imprimirse sin reinicio real (Blind, Edge Case) — se exige TTY o RESTART_APP_CMD, espera con pg_isready y falla explícita; cabecera avisa del rate limit y de la cuenta de prueba.
+  - `[medium]` `patch` architecture.md afirmaba que lint:arch impide leer process.env en la capa HTTP (Blind) — reformulado como convención.
+  - `[medium]` `patch` README sin tabla de variables ni cómo entra el revisor (Blind) — párrafo agregado.
+  - `[low]` `patch` SOURCES.md con licencias directas no verificadas (Blind) — se leyeron de node_modules y se registraron.
+  - `[low]` `patch` GIT_STRATEGY.md afirmaba CI sin aclarar que no corrió (Blind) — reformulado.
+  - `[low]` `reject` GET de asset inexistente devuelve 200 index.html (Edge Case, Blind, Verification Gap) — comportamiento previo y documentado; la guarda por extensión añade una rama sin daño demostrado.
+  - `[low]` `reject` sendFile con index.html ausente da 500 (Edge Case) — build parcial, escenario no alcanzable con `npm run build`.
+  - `[low]` `reject` pruebas adicionales de HEAD, traversal, PUT/DELETE (Edge Case, Blind) — express.static ya los cubre; añadiría pruebas de librería.
+  - `[low]` `reject` script con jq en vez de sed, versión de curl, contraseña en la línea de comandos (Blind, Edge Case) — script de evidencia local, sin impacto real.
+  - `[low]` `reject` GET /api/accidents truncado a 100 sin indicador, 415/503 no listados en api.md (Blind) — diferido ya registrado en LIMITATIONS.md; detalle menor.
+  - `[false]` `reject` GIT_STRATEGY menciona CI inexistente (Blind) — `.github/workflows/ci.yml` existe (el revisor no lo vio en el diff).
+  - `[false]` `reject` roles inconsistentes entre README y api.md (Blind) — DEC-011: lecturas filtradas por dueño y PATCH permitido al REVIEWER sobre cualquier accidente; es coherente y está en api.md.
+  - `[false]` `reject` docs enlazan archivos inexistentes (Blind) — DECISIONS.md y docs/bmad existen; TEST_REPORT y evidence se crearon después.
+  - `[false]` `reject` ausencia de pruebas end-to-end de server.ts/staticDir (Blind, Intent) — cubierto por la ejecución real de `npm start` y el AC-9.
+  - `[false]` `reject` brecha de verificación en el 404 final (Verification Gap) — el revisor reportó 0 hallazgos.
+
+## Auto Run Result
+
+Status: done
+- Resumen: 404 JSON final en Express y prueba de servido estático (`static.test.ts`, 6 pruebas); README reescrito; docs api, data-model, architecture (grafo `.mmd`, sin `dot`), SOURCES, LIMITATIONS, GIT_STRATEGY, plantilla de PR; `scripts/verify-persistence.sh`. Evidencia, trazabilidad e informe de pruebas hechos por el agente padre.
+- Parches aplicados: 4 medium y 2 low. Rechazados: ver Review Triage Log. Diferidos: 0.
+- Follow-up review recommendation: false (se parchearon 4 medium; sin high — la regla de 2 o más medium dispararía true, pero todos fueron de documentación/script y se verificaron ejecutando el AC-6 y el AC-9 después del parche).
+- Verificación: build, lint:arch y npm test (30 archivos/281 backend, 12/48 frontend) exit 0; AC-6, AC-7 y AC-9 ejecutados (docs/evidence/S3.3-*).
+- Riesgos residuales: UI no probada en navegador real; CI de GitHub sin ejecutar; licencias de BMAD y plantillas no verificadas.
 
 ## Design Notes
 
