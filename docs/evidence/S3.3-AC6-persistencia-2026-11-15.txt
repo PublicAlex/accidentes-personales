@@ -1,0 +1,17 @@
+# AC-6 persistencia - 2026-11-15
+$ RESTART_APP_CMD=restart-app.sh scripts/verify-persistence.sh http://localhost:3000
+== Base: http://localhost:3000
+== Registrando cuenta persistencia-179480118816277@example.test
+{"id":"45267a5d-348d-41c7-aeb5-72cbf507def4","email":"persistencia-179480118816277@example.test","fullName":"Persona Persistencia","role":"USER"}
+== Creando accidente
+{"id":"aace59f0-66f9-4190-ba84-6eb539d2b2d8","affectedName":"Persona Persistencia","documentType":"CC","documentNumber":"12345678","phone":"3001234567","contactEmail":"contacto@example.test","accidentType":"TRANSITO","occurredOn":"2024-01-15","place":"Calle 1 con Carrera 2","description":"Accidente de prueba para verificar persistencia.","status":"REGISTRADO","createdAt":"2026-11-16T03:53:09.305Z","updatedAt":"2026-11-16T03:53:09.305Z"}
+== Antes del reinicio: {"id":"aace59f0-66f9-4190-ba84-6eb539d2b2d8","affectedName":"Persona Persistencia","documentType":"CC","documentNumber":"12345678","phone":"3001234567","contactEmail":"contacto@example.test","accidentType":"TRANSITO","occurredOn":"2024-01-15","place":"Calle 1 con Carrera 2","description":"Accidente de prueba para verificar persistencia.","status":"REGISTRADO","createdAt":"2026-11-16T03:53:09.305Z","updatedAt":"2026-11-16T03:53:09.305Z"}
+== Reiniciando la app: /tmp/claude-1000/scratch/restart-app.sh
+app reiniciada (pid 146271)
+== docker compose restart db
+ Container carpetasinttulo-db-1  Restarting
+ Container carpetasinttulo-db-1  Started
+== Consultando tras reinicios
+{"id":"aace59f0-66f9-4190-ba84-6eb539d2b2d8","affectedName":"Persona Persistencia","documentType":"CC","documentNumber":"12345678","phone":"3001234567","contactEmail":"contacto@example.test","accidentType":"TRANSITO","occurredOn":"2024-01-15","place":"Calle 1 con Carrera 2","description":"Accidente de prueba para verificar persistencia.","status":"REGISTRADO","createdAt":"2026-11-16T03:53:09.305Z","updatedAt":"2026-11-16T03:53:09.305Z"}
+OK: el accidente aace59f0-66f9-4190-ba84-6eb539d2b2d8 persiste sin cambios.
+exit=0

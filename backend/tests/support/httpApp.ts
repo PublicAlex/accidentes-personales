@@ -15,7 +15,7 @@ export const TEST_ORIGIN = 'http://localhost:5173';
 
 export function buildTestApp(
   pool: Pool,
-  opts: { rateLimit?: { windowMs: number; max: number }; revocations?: TokenRevocationRepository; cookieSecure?: boolean } = {},
+  opts: { rateLimit?: { windowMs: number; max: number }; revocations?: TokenRevocationRepository; cookieSecure?: boolean; staticDir?: string } = {},
 ): { app: Express; logs: () => string } {
   const chunks: string[] = [];
   const sink = new Writable({
@@ -40,6 +40,7 @@ export function buildTestApp(
     logger: new PinoLogger('info', sink),
     rateLimit: opts.rateLimit ?? { windowMs: 60_000, max: 10_000 },
     revocations: opts.revocations ?? new PgTokenRevocationRepository(pool),
+    ...(opts.staticDir ? { staticDir: opts.staticDir } : {}),
   });
   return { app: createHttpApp(deps), logs: () => chunks.join('') };
 }

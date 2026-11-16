@@ -54,6 +54,9 @@ export function createHttpApp(deps: HttpAppDeps): Express {
     });
   }
 
+  // Todo lo no resuelto (incluye métodos no GET fuera de /api) responde con el formato único de error.
+  app.use((_req, _res, next) => next(new NotFoundError()));
+
   app.use(createErrorMapper(logger));
   return app;
 }

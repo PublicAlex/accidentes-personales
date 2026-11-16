@@ -3,3 +3,12 @@
 8caf21e5b81a698045ec63af0640892b523124d0:docs/bmad/planning-artifacts/architecture/architecture-accidentes-personales-2026-11-15/ARCHITECTURE-SPINE.md:generic-api-key:299
 # - manifiesto BMAD: hash sha256 de integridad de un archivo, no un secreto
 5e832c700cd9d5554c23245a789b92b4ab8bf079:_bmad/_config/files-manifest.csv:generic-api-key:48
+# Falsos positivos revisados manualmente en S3.3 (2026-11-15), al ejecutar gitleaks sobre el historial completo:
+# - env.ts: constante con el JWT_SECRET de EJEMPLO público de .env.example (el servidor la rechaza en producción)
+4fed94bb26a4cbabd3500c0bf4880555dc65d347:backend/src/infrastructure/config/env.ts:generic-api-key:29
+# - spec de S2.1: texto que cita ese mismo valor de ejemplo
+24303a570eb7da8bc11604fb4fd8afb2bae5a849:docs/bmad/implementation-artifacts/spec-2-1-autenticacion-y-endurecimiento-http.md:generic-api-key:92
+# - prueba de integración: contraseña incorrecta ficticia del escenario de login fallido
+c32c90c5ae0d61823b7021827ab19affa61d28fa:backend/tests/integration/auth.test.ts:generic-api-key:97
+# - evidencia AC-9: contraseña ficticia de una cuenta de prueba en un comando curl (BD temporal ya eliminada)
+f0491cb2718de7f3f9f0e668944b37e61e43e5ae:docs/evidence/S3.3-AC9-clon-limpio-2026-11-15.txt:generic-api-key:106

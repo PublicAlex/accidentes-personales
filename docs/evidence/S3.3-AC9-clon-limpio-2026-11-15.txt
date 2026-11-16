@@ -1,0 +1,225 @@
+# AC-9 arranque limpio desde clon nuevo - 2026-11-15
+Entorno: git clone local de la rama feat/S3.3-entrega (HEAD ad2dd64) en un directorio temporal; solo se siguieron los pasos del README.
+Ajustes para no chocar con la BD de desarrollo en marcha (README, seccion 'Si el puerto 5432 ... estan ocupados'): POSTGRES_PORT=5433 y COMPOSE_PROJECT_NAME=accidentes9. Secretos generados con openssl rand -hex 32 (no se registran).
+Navegador real no usado: el flujo de UI (registrar, consultar) se ejercito por HTTP con curl contra el build servido.
+
+$ git clone /home/homie/Escritorio/desarrollo agentico/Carpeta sin título /tmp/claude-1000/scratch/clone
+Clonando en '/tmp/claude-1000/scratch/clone'...
+hecho.
+[exit 0]
+ad2dd64 docs(S3.3): evidencia de AC-6 y hash de contraseña
+abad6b3 docs(S3.3): fuentes, limitaciones, estrategia de Git y plantilla de PR
+2fb8807 docs(S3.3): API, modelo de datos y arquitectura con grafo de dependencias
+feat/S3.3-entrega
+$ npm ci
+  run `npm fund` for details
+
+3 moderate severity vulnerabilities
+
+To address all issues (including breaking changes), run:
+  npm audit fix --force
+
+Run `npm audit` for details.
+[exit 0]
+$ cp .env.example .env
+$ (editar .env: JWT_SECRET, POSTGRES_PASSWORD, REVIEWER_PASSWORD con openssl rand -hex 32; POSTGRES_PORT=5433 y COMPOSE_PROJECT_NAME=accidentes9 para no chocar con la BD en marcha; DATABASE_URL/TEST_DATABASE_URL coherentes) [valores secretos no registrados]
+$ docker compose up -d db
+ Network accidentes9_default  Creating
+ Network accidentes9_default  Created
+ Volume accidentes9_pgdata  Creating
+ Volume accidentes9_pgdata  Created
+ Container accidentes9-db-1  Creating
+ Container accidentes9-db-1  Created
+ Container accidentes9-db-1  Starting
+ Container accidentes9-db-1  Started
+[exit 0]
+accidentes9-db-1 Up 7 seconds (healthy)
+$ npm run migrate
+);
+CREATE INDEX accidents_owner_occurred_idx ON accidents (owner_id, occurred_on DESC, created_at DESC);
+
+CREATE TABLE revoked_tokens (
+  jti        uuid PRIMARY KEY,
+  user_id    uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  expires_at timestamptz NOT NULL,
+  revoked_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX revoked_tokens_expires_idx ON revoked_tokens (expires_at);
+;
+INSERT INTO "public"."pgmigrations" (name, run_on) VALUES ('1763230000000_initial-schema', NOW());
+
+
+Migrations complete!
+[exit 0]
+$ npm run build
+
+✓ built in 254ms
+
+> backend@0.1.0 build
+> tsc -p tsconfig.build.json
+
+[exit 0]
+$ npm run seed:reviewer
+
+> accidentes-personales@0.1.0 seed:reviewer
+> node --env-file-if-exists=.env backend/dist/main/seedReviewer.js
+
+Revisor listo: revisor@example.test
+[exit 0]
+$ npm start   (en segundo plano)
+> node --env-file-if-exists=.env backend/dist/main/server.js
+
+{"level":40,"time":1794801261928,"pid":147948,"hostname":"homie-X99-QD4","msg":"COOKIE_SECURE=false en producción: la cookie de sesión viaja sin Secure"}
+{"level":30,"time":1794801261938,"pid":147948,"hostname":"homie-X99-QD4","port":3000,"msg":"Servidor escuchando"}
+{"level":30,"time":1794801261970,"pid":147948,"hostname":"homie-X99-QD4","count":0,"msg":"Revocaciones expiradas purgadas"}
+$ curl localhost:3000/ -o /dev/null -w %{http_code} %{content_type}\n
+200 text/html; charset=utf-8
+
+$ curl localhost:3000/accidentes/nuevo -o /dev/null -w %{http_code} %{content_type}\n
+200 text/html; charset=utf-8
+
+$ curl localhost:3000/api/no-existe
+HTTP/1.1 404 Not Found
+Content-Security-Policy: default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests
+Cross-Origin-Opener-Policy: same-origin
+Cross-Origin-Resource-Policy: same-origin
+Origin-Agent-Cluster: ?1
+Referrer-Policy: no-referrer
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+X-Content-Type-Options: nosniff
+X-DNS-Prefetch-Control: off
+X-Download-Options: noopen
+X-Frame-Options: SAMEORIGIN
+X-Permitted-Cross-Domain-Policies: none
+X-XSS-Protection: 0
+Vary: Origin
+Access-Control-Allow-Credentials: true
+Cache-Control: no-store
+Content-Type: application/json; charset=utf-8
+Content-Length: 64
+ETag: W/"40-5DDlkPw/AVs3YOcCfVO7rV+kFqw"
+Date: Mon, 16 Nov 2026 03:54:22 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"error":{"code":"NOT_FOUND","message":"Recurso no encontrado"}}
+$ curl -X POST localhost:3000/api/auth/register -H Content-Type: application/json -d {"email":"clon@example.test","password":"clave-clon-12345","fullName":"Persona Clon"}
+HTTP/1.1 201 Created
+Content-Security-Policy: default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests
+Cross-Origin-Opener-Policy: same-origin
+Cross-Origin-Resource-Policy: same-origin
+Origin-Agent-Cluster: ?1
+Referrer-Policy: no-referrer
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+X-Content-Type-Options: nosniff
+X-DNS-Prefetch-Control: off
+X-Download-Options: noopen
+X-Frame-Options: SAMEORIGIN
+X-Permitted-Cross-Domain-Policies: none
+X-XSS-Protection: 0
+Vary: Origin
+Access-Control-Allow-Credentials: true
+Cache-Control: no-store
+RateLimit: "10-in-15min"; r=9; t=900
+RateLimit-Policy: "10-in-15min"; q=10; w=900; pk=:YmIwY2Q1MTM2YWU1:
+Content-Type: application/json; charset=utf-8
+Content-Length: 113
+ETag: W/"71-KtkQmu5Q+l24/LEW+iqJvNMqMDQ"
+Date: Mon, 16 Nov 2026 03:54:22 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"id":"e9be326e-fa5a-43a9-a6fa-86edef853e23","email":"clon@example.test","fullName":"Persona Clon","role":"USER"}
+$ curl login (cookie guardada)
+HTTP/1.1 200 OK
+Content-Security-Policy: default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests
+Cross-Origin-Opener-Policy: same-origin
+Cross-Origin-Resource-Policy: same-origin
+Origin-Agent-Cluster: ?1
+Referrer-Policy: no-referrer
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+X-Content-Type-Options: nosniff
+X-DNS-Prefetch-Control: off
+X-Download-Options: noopen
+X-Frame-Options: SAMEORIGIN
+X-Permitted-Cross-Domain-Policies: none
+X-XSS-Protection: 0
+Vary: Origin
+Access-Control-Allow-Credentials: true
+Cache-Control: no-store
+RateLimit: "10-in-15min"; r=8; t=900
+RateLimit-Policy: "10-in-15min"; q=10; w=900; pk=:YmIwY2Q1MTM2YWU1:
+Set-Cookie: session=<TOKEN>; Path=/; Expires=Mon, 16 Nov 2026 04:54:23 GMT; HttpOnly; SameSite=Lax
+Content-Type: application/json; charset=utf-8
+Content-Length: 113
+ETag: W/"71-KtkQmu5Q+l24/LEW+iqJvNMqMDQ"
+Date: Mon, 16 Nov 2026 03:54:23 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"id":"e9be326e-fa5a-43a9-a6fa-86edef853e23","email":"clon@example.test","fullName":"Persona Clon","role":"USER"}
+$ curl POST /api/accidents (con cookie)
+HTTP/1.1 201 Created
+Content-Security-Policy: default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests
+Cross-Origin-Opener-Policy: same-origin
+Cross-Origin-Resource-Policy: same-origin
+Origin-Agent-Cluster: ?1
+Referrer-Policy: no-referrer
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+X-Content-Type-Options: nosniff
+X-DNS-Prefetch-Control: off
+X-Download-Options: noopen
+X-Frame-Options: SAMEORIGIN
+X-Permitted-Cross-Domain-Policies: none
+X-XSS-Protection: 0
+Vary: Origin
+Access-Control-Allow-Credentials: true
+Cache-Control: no-store
+Content-Type: application/json; charset=utf-8
+Content-Length: 426
+ETag: W/"1aa-QqKEJzNn6Z49kaR5kg4SEigBLQo"
+Date: Mon, 16 Nov 2026 03:54:23 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"id":"164e06b2-3e71-4cbb-bd02-26c901095e88","affectedName":"Persona Clon","documentType":"CC","documentNumber":"87654321","phone":"3009876543","contactEmail":"contacto@example.test","accidentType":"LABORAL","occurredOn":"2025-03-10","place":"Planta principal","description":"Accidente de prueba creado desde el clon limpio.","status":"REGISTRADO","createdAt":"2026-11-16T03:54:23.245Z","updatedAt":"2026-11-16T03:54:23.245Z"}
+$ curl GET /api/accidents (con cookie)
+HTTP/1.1 200 OK
+Content-Security-Policy: default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests
+Cross-Origin-Opener-Policy: same-origin
+Cross-Origin-Resource-Policy: same-origin
+Origin-Agent-Cluster: ?1
+Referrer-Policy: no-referrer
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+X-Content-Type-Options: nosniff
+X-DNS-Prefetch-Control: off
+X-Download-Options: noopen
+X-Frame-Options: SAMEORIGIN
+X-Permitted-Cross-Domain-Policies: none
+X-XSS-Protection: 0
+Vary: Origin
+Access-Control-Allow-Credentials: true
+Cache-Control: no-store
+Content-Type: application/json; charset=utf-8
+Content-Length: 120
+ETag: W/"78-oLic9OjWJh8IqTlDgX9WWRmcOgg"
+Date: Mon, 16 Nov 2026 03:54:23 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+[{"id":"164e06b2-3e71-4cbb-bd02-26c901095e88","accidentType":"LABORAL","occurredOn":"2025-03-10","status":"REGISTRADO"}]
+$ login del revisor y PATCH de estado
+$ login del revisor (REVIEWER_EMAIL/REVIEWER_PASSWORD de .env) y PATCH de estado
+login revisor: 200
+{"id":"164e06b2-3e71-4cbb-bd02-26c901095e88","status":"EN_REVISION","updatedAt":"2026-11-16T03:54:32.402Z"}
+$ curl GET accidente como propietario (estado actualizado)
+{"id":"164e06b2-3e71-4cbb-bd02-26c901095e88","affectedName":"Persona Clon","documentType":"CC","documentNumber":"87654321","phone":"3009876543","contactEmail":"contacto@example.test","accidentType":"LABORAL","occurredOn":"2025-03-10","place":"Planta principal","description":"Accidente de prueba creado desde el clon limpio.","status":"EN_REVISION","createdAt":"2026-11-16T03:54:23.245Z","updatedAt":"2026-11-16T03:54:32.402Z"}
+== grep frontend/dist del clon (AC-7)
+valor de JWT_SECRET generado (oculto): 0 coincidencias
+valor de POSTGRES_PASSWORD generado (oculto): 0 coincidencias
+valor de REVIEWER_PASSWORD generado (oculto): 0 coincidencias
+patron literal 'postgres://': 0
+patron literal 'DATABASE_URL': 0
+patron literal 'JWT_SECRET': 0
+patron literal 'password_hash': 0
+== teardown: docker compose down -v (contenedor, red y volumen del proyecto accidentes9 eliminados) y directorio temporal borrado

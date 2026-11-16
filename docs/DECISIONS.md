@@ -138,3 +138,16 @@ Origen: `docs/bmad/planning-artifacts/architecture/architecture-accidentes-perso
 - Contexto: el agente dejó como diferido que la semilla del revisor promueve a `REVIEWER` a una cuenta USER que ya exista con ese email.
 - Análisis: el `ON CONFLICT` también reemplaza el `password_hash` con la credencial del entorno. Quien hubiera registrado antes ese email pierde el acceso y no hereda el rol, así que no hay escalada de privilegios.
 - Riesgo residual (aceptado en el MVP): los accidentes de esa cuenta previa quedan bajo la cuenta del revisor. Mitigación: usar un email de revisor que no esté expuesto al registro público. Se documenta en `LIMITATIONS.md`.
+
+### DEC-020 — Revisión humana de S3.3
+- Fecha: 2026-11-15
+- Tipo: verificación y corrección.
+- Hallazgos y acciones:
+  1. **Falsos positivos de gitleaks.** Los 4 nuevos se revisaron uno por uno: el placeholder que `env.ts` rechaza a propósito, valores ficticios en un spec y en un test, y la contraseña de una cuenta de prueba en la evidencia AC-9. Además se comprobó que los valores reales del `.env` local no aparecen en ningún commit del historial (`git grep` sobre todos los commits).
+  2. **Licencias.** El agente las había dejado "no verificadas". Se verificaron:
+     - BMAD: MIT.
+     - reference-architecture-node: MIT.
+     - Vite: MIT.
+     - Node-Boilerplate: MPL-2.0. No se usó su código, así que no aplica.
+     - Se actualizó `SOURCES.md`.
+  3. **`npm audit`.** Las 3 vulnerabilidades moderadas vienen de la cadena transitiva de `node-pg-migrate` y no se alcanzan desde el servidor HTTP. Se acepta y se documenta en `LIMITATIONS.md`.
