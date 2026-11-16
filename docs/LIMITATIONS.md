@@ -31,3 +31,8 @@
 ## Licencias
 
 Las licencias de varias fuentes no se pudieron verificar localmente; ver `docs/SOURCES.md`.
+
+## `npm audit` (revisado el 2026-11-15)
+- 3 vulnerabilidades moderadas, todas en `glob`/`minimatch`, dependencias transitivas de `node-pg-migrate@9.0.0`. Una es GHSA-g3hv-75wg-m249, un DoS por patrones glob.
+- Impacto: solo afecta a la herramienta de migraciones, que se ejecuta a mano con patrones fijos del repositorio. Ese código no corre en el servidor HTTP ni recibe entradas de usuarios.
+- Decisión: se acepta en el MVP. La corrección que propone `npm audit fix --force` implica un cambio mayor; queda pendiente actualizar cuando `node-pg-migrate` publique una versión corregida.
