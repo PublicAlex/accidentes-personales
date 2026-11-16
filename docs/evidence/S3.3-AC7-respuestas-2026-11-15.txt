@@ -1,0 +1,150 @@
+# AC-7: respuestas de la API no contienen password_hash/JWT_SECRET - 2026-11-15
+$ curl register
+HTTP/1.1 201 Created
+Content-Security-Policy: default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests
+Cross-Origin-Opener-Policy: same-origin
+Cross-Origin-Resource-Policy: same-origin
+Origin-Agent-Cluster: ?1
+Referrer-Policy: no-referrer
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+X-Content-Type-Options: nosniff
+X-DNS-Prefetch-Control: off
+X-Download-Options: noopen
+X-Frame-Options: SAMEORIGIN
+X-Permitted-Cross-Domain-Policies: none
+X-XSS-Protection: 0
+Vary: Origin
+Access-Control-Allow-Credentials: true
+Cache-Control: no-store
+RateLimit: "10-in-15min"; r=6; t=877
+RateLimit-Policy: "10-in-15min"; q=10; w=900; pk=:YmIwY2Q1MTM2YWU1:
+Content-Type: application/json; charset=utf-8
+Content-Length: 118
+ETag: W/"76-UiFAnA46F1ORF0kbkdUL0XXx7/o"
+Date: Mon, 16 Nov 2026 03:52:24 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"id":"c40ef263-22f2-4e9f-b977-e6a3e1c84333","email":"hash-29078@example.test","fullName":"Prueba Hash","role":"USER"}
+$ curl login
+HTTP/1.1 200 OK
+Content-Security-Policy: default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests
+Cross-Origin-Opener-Policy: same-origin
+Cross-Origin-Resource-Policy: same-origin
+Origin-Agent-Cluster: ?1
+Referrer-Policy: no-referrer
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+X-Content-Type-Options: nosniff
+X-DNS-Prefetch-Control: off
+X-Download-Options: noopen
+X-Frame-Options: SAMEORIGIN
+X-Permitted-Cross-Domain-Policies: none
+X-XSS-Protection: 0
+Vary: Origin
+Access-Control-Allow-Credentials: true
+Cache-Control: no-store
+RateLimit: "10-in-15min"; r=5; t=876
+RateLimit-Policy: "10-in-15min"; q=10; w=900; pk=:YmIwY2Q1MTM2YWU1:
+Set-Cookie: session=<TOKEN>; Path=/; Expires=Mon, 16 Nov 2026 04:52:24 GMT; HttpOnly; SameSite=Lax
+Content-Type: application/json; charset=utf-8
+Content-Length: 118
+ETag: W/"76-UiFAnA46F1ORF0kbkdUL0XXx7/o"
+Date: Mon, 16 Nov 2026 03:52:24 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"id":"c40ef263-22f2-4e9f-b977-e6a3e1c84333","email":"hash-29078@example.test","fullName":"Prueba Hash","role":"USER"}
+$ curl me
+HTTP/1.1 200 OK
+Content-Security-Policy: default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests
+Cross-Origin-Opener-Policy: same-origin
+Cross-Origin-Resource-Policy: same-origin
+Origin-Agent-Cluster: ?1
+Referrer-Policy: no-referrer
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+X-Content-Type-Options: nosniff
+X-DNS-Prefetch-Control: off
+X-Download-Options: noopen
+X-Frame-Options: SAMEORIGIN
+X-Permitted-Cross-Domain-Policies: none
+X-XSS-Protection: 0
+Vary: Origin
+Access-Control-Allow-Credentials: true
+Cache-Control: no-store
+Content-Type: application/json; charset=utf-8
+Content-Length: 118
+ETag: W/"76-UiFAnA46F1ORF0kbkdUL0XXx7/o"
+Date: Mon, 16 Nov 2026 03:52:24 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"id":"c40ef263-22f2-4e9f-b977-e6a3e1c84333","email":"hash-29078@example.test","fullName":"Prueba Hash","role":"USER"}
+$ curl lista
+HTTP/1.1 200 OK
+Content-Security-Policy: default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests
+Cross-Origin-Opener-Policy: same-origin
+Cross-Origin-Resource-Policy: same-origin
+Origin-Agent-Cluster: ?1
+Referrer-Policy: no-referrer
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+X-Content-Type-Options: nosniff
+X-DNS-Prefetch-Control: off
+X-Download-Options: noopen
+X-Frame-Options: SAMEORIGIN
+X-Permitted-Cross-Domain-Policies: none
+X-XSS-Protection: 0
+Vary: Origin
+Access-Control-Allow-Credentials: true
+Cache-Control: no-store
+Content-Type: application/json; charset=utf-8
+Content-Length: 2
+ETag: W/"2-l9Fw4VUO7kr8CvBlt4zaMCqXZ0w"
+Date: Mon, 16 Nov 2026 03:52:24 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+[]
+$ curl login incorrecto
+HTTP/1.1 401 Unauthorized
+Content-Security-Policy: default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests
+Cross-Origin-Opener-Policy: same-origin
+Cross-Origin-Resource-Policy: same-origin
+Origin-Agent-Cluster: ?1
+Referrer-Policy: no-referrer
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+X-Content-Type-Options: nosniff
+X-DNS-Prefetch-Control: off
+X-Download-Options: noopen
+X-Frame-Options: SAMEORIGIN
+X-Permitted-Cross-Domain-Policies: none
+X-XSS-Protection: 0
+Vary: Origin
+Access-Control-Allow-Credentials: true
+Cache-Control: no-store
+RateLimit: "10-in-15min"; r=4; t=876
+RateLimit-Policy: "10-in-15min"; q=10; w=900; pk=:YmIwY2Q1MTM2YWU1:
+Content-Type: application/json; charset=utf-8
+Content-Length: 72
+ETag: W/"48-kzPyJGZjA2Lhwl0b00jp2aCop/4"
+Date: Mon, 16 Nov 2026 03:52:25 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"error":{"code":"UNAUTHENTICATED","message":"Credenciales inválidas"}}
+== busqueda en todas las respuestas anteriores
+patron 'password_hash': 0 coincidencias
+patron 'passwordHash': 0 coincidencias
+patron '\$2b\$': 0 coincidencias
+patron '<JWT_SECRET>': 0 coincidencias
+== busqueda en el log de la app
+patron 'password_hash': 0
+patron '\$2b\$': 0
+patron '<JWT_SECRET>': 0
+patron 'clave-larga-123': 0
+== pruebas automatizadas: backend/tests/integration/security.test.ts (busca password_hash y JWT_SECRET en respuestas y logs)
+backend/tests/integration/auth.test.ts:22:  it('201 con {id,email,fullName,role:USER} y sin password_hash', async () => {
+backend/tests/integration/security.test.ts:52:  it('ninguna respuesta ni log contiene password_hash, JWT_SECRET ni la contraseña', async () => {
+backend/tests/integration/security.test.ts:64:    for (const needle of ['password_hash', 'passwordHash', 'JWT_SECRET', TEST_JWT_SECRET, validUser.password, '$2b$']) {
+backend/tests/integration/seedEntrypoint.test.ts:50:    const f = await pool.query<{ role: string; h: string }>('SELECT role, left(password_hash,7) AS h FROM users');
+backend/tests/integration/seedReviewer.test.ts:24:      'SELECT email, role, left(password_hash, 7) AS h FROM users',
+backend/tests/integration/schema.test.ts:16:  await pool.query('INSERT INTO users (id, email, password_hash, full_name, role) VALUES ($1,$2,$3,$4,$5)', [
