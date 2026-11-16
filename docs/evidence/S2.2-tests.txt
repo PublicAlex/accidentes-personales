@@ -1,0 +1,18 @@
+# 2026-11-15T19:07:36-05:00  $ npm test -w backend
+
+> backend@0.1.0 test
+> vitest run
+
+
+ RUN  v5.1.0 /home/homie/Escritorio/desarrollo agentico/Carpeta sin título/backend
+
+
+ Test Files  27 passed (27)
+      Tests  253 passed (253)
+   Start at  19:07:45
+   Duration  51.79s (tests 93%, import 6%)
+
+    Isolate  27 workers spawned · ~139ms startup each (spawn + environment, per file)
+             at least ~3.60s faster with isolate: false — reuses workers across files instead of one per file
+
+exit=0
