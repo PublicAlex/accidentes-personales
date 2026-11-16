@@ -46,3 +46,13 @@ export function accidentPresenter(a: Accident): AccidentDto {
 export function accidentSummaryPresenter(s: AccidentSummary): AccidentSummaryDto {
   return { id: s.id, accidentType: s.accidentType, occurredOn: s.occurredOn, status: s.status };
 }
+
+export interface StatusChangeDto {
+  id: string;
+  status: string;
+  updatedAt: string;
+}
+
+export function statusChangePresenter(r: { id: string; status: string; updatedAt: Date }): StatusChangeDto {
+  return { id: r.id, status: r.status, updatedAt: r.updatedAt.toISOString() };
+}

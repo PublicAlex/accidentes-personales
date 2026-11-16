@@ -1,15 +1,17 @@
 import type { RequestHandler } from 'express';
+import type { ChangeAccidentStatus } from '../../../application/use-cases/accidents/ChangeAccidentStatus.js';
 import type { CreateAccident } from '../../../application/use-cases/accidents/CreateAccident.js';
 import type { GetMyAccident } from '../../../application/use-cases/accidents/GetMyAccident.js';
 import type { ListMyAccidents } from '../../../application/use-cases/accidents/ListMyAccidents.js';
 import { getAuth } from '../middleware/authenticate.js';
-import { accidentPresenter, accidentSummaryPresenter } from '../presenters/accidentPresenter.js';
-import type { CreateAccidentBody } from '../schemas/accidentSchemas.js';
+import { accidentPresenter, accidentSummaryPresenter, statusChangePresenter } from '../presenters/accidentPresenter.js';
+import type { ChangeStatusBody, CreateAccidentBody } from '../schemas/accidentSchemas.js';
 
 export interface AccidentUseCases {
   createAccident: Pick<CreateAccident, 'execute'>;
   listMyAccidents: Pick<ListMyAccidents, 'execute'>;
   getMyAccident: Pick<GetMyAccident, 'execute'>;
+  changeAccidentStatus: Pick<ChangeAccidentStatus, 'execute'>;
 }
 
 /** Sin reglas de negocio: el propietario sale solo de res.locals.auth. */
@@ -30,5 +32,11 @@ export function createAccidentController(uc: AccidentUseCases) {
     res.status(200).json(accidentPresenter(accident));
   };
 
-  return { create, list, get };
+  const changeStatus: RequestHandler = async (req, res) => {
+    const { status } = req.body as ChangeStatusBody;
+    const result = await uc.changeAccidentStatus.execute({ actor: getAuth(res), id: String(req.params.id), status });
+    res.status(200).json(statusChangePresenter(result));
+  };
+
+  return { create, list, get, changeStatus };
 }
