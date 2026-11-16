@@ -43,12 +43,12 @@ development_status:
 
   epic-2: in-progress
   2-1-autenticación-y-endurecimiento-http: done
-  2-2-registrar-listar-y-ver-accidentes-con-aislamiento-por-propie: review
-  2-3-cambio-de-estado-por-revisor-con-concurrencia: review
+  2-2-registrar-listar-y-ver-accidentes-con-aislamiento-por-propie: done
+  2-3-cambio-de-estado-por-revisor-con-concurrencia: done
   epic-2-retrospective: optional
 
-  epic-3: backlog
-  3-1-app-react-con-landing-cuenta-y-rutas-protegidas: backlog
+  epic-3: in-progress
+  3-1-app-react-con-landing-cuenta-y-rutas-protegidas: review
   3-2-formulario-de-accidente-listado-y-detalle: backlog
   3-3-build-de-producción-readme-y-evidencia-de-entrega: backlog
   epic-3-retrospective: optional

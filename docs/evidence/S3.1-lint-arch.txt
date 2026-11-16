@@ -1,0 +1,10 @@
+Fecha: 2026-11-15T19:29:25-05:00
+
+> accidentes-personales@0.1.0 lint:arch
+> depcruise backend/src --config .dependency-cruiser.cjs && node scripts/check-globals.mjs
+
+
+✔ no dependency violations found (69 modules, 193 dependencies cruised)
+
+check-globals: sin violaciones.
+exit=0
