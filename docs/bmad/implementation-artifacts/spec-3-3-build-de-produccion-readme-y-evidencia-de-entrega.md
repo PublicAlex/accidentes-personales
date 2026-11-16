@@ -2,7 +2,8 @@
 title: 'S3.3 Build de producción, README y evidencia de entrega'
 type: 'feature'
 created: '2026-11-15'
-status: 'ready-for-dev'
+status: 'in-review'
+baseline_revision: '77d3b3b55d64f18acc58df9d4264ece4d8fc7776'
 review_loop_iteration: 0
 followup_review_recommended: false
 context:
@@ -53,7 +54,8 @@ deferred: []
 - `backend/src/interfaces/http/app.ts` -- 404 JSON para todo lo no resuelto -- formato único
 - `README.md`, `docs/{api,data-model,architecture,SOURCES,LIMITATIONS,GIT_STRATEGY}.md`, `docs/architecture/dependency-graph.*`, `.github/pull_request_template.md` -- documentación
 - `scripts/verify-persistence.sh` -- AC-6 repetible
-- `docs/evidence/*`, `docs/TRACEABILITY.md`, `docs/TEST_REPORT.md` -- evidencia real
+- NO es parte de esta ejecución: `docs/evidence/*`, `docs/TRACEABILITY.md`, `docs/TEST_REPORT.md` y la validación del README en clon limpio las hace el agente padre después; no los crees.
+- Contenido exigido: README en español (propósito; prerrequisitos Node 24 y Docker con plugin compose; desde clon nuevo: `npm ci`, `cp .env.example .env` y qué valores cambiar con `openssl rand -hex 32` (JWT_SECRET, POSTGRES_PASSWORD, REVIEWER_PASSWORD; mantener DATABASE_URL/TEST_DATABASE_URL coherentes), `docker compose up -d db`, `npm run migrate`, `npm run build`, `npm run seed:reviewer`, `npm start`, URL `http://localhost:3000`; cómo usar otro `POSTGRES_PORT`/`COMPOSE_PROJECT_NAME` si el 5432 está ocupado; modo dev; pruebas (incluye BD de prueba `accidentes_test` y `migrate:test`); `lint:arch`; `scan:secrets`; estructura; vínculo accidente-cuenta por identidad verificada en servidor (FR-06); topología mismo origen; `COOKIE_SECURE` (DEC-015); enlaces a docs y a LIMITATIONS). docs/api.md (endpoints, auth por cookie, request/response, códigos, formato de error, rate limit) y docs/data-model.md (tablas, constraints, ER mermaid) derivados de `routes/`, `schemas/`, `errorMapper.ts` y la migración. docs/architecture.md (capas, puertos/adaptadores, reglas de dependencia, secuencia de auth en mermaid, vínculo cuenta-accidente, grafo exportado con `npx depcruise backend/src --config .dependency-cruiser.cjs --output-type dot | dot -T svg` a docs/architecture/dependency-graph.svg si `dot` existe; si no, `--output-type mermaid` a `.mmd` y nota). docs/SOURCES.md (reference-architecture-node, create-vite react-ts, Node-Boilerplate considerado; licencias, motivo, adaptaciones; BMAD v6.12.4). docs/LIMITATIONS.md (DEC-015, DEC-019 y diferidos de docs/bmad/agent-logs/* y de los specs). docs/GIT_STRATEGY.md (trunk-based ligero: main + feat/S*-..., fix/..., docs/...; merges --no-ff que simulan PR por no haber remoto; Conventional Commits en español; ids de historia). `.github/pull_request_template.md`. `scripts/verify-persistence.sh`: crea cuenta+accidente por curl contra una URL base, imprime, y compara tras reinicios (el reinicio lo orquesta quien lo ejecuta o el script con `docker compose restart db`). Verifica licencias leyendo `node_modules`/web solo si es posible; si no puedes confirmar una licencia, escríbelo como "no verificada".
 
 **Acceptance Criteria:**
 - Given `npm run build` y `npm start`, when se pide `/`, una ruta SPA y `/api/me-no-existe`, then 200 HTML, 200 HTML y 404 JSON.
