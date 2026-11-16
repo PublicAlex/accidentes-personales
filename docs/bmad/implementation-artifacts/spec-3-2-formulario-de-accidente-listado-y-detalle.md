@@ -2,7 +2,7 @@
 title: 'S3.2 Formulario de accidente, listado y detalle'
 type: 'feature'
 created: '2026-11-15'
-status: 'in-progress'
+status: 'done'
 baseline_revision: '23652d6a59ace23a54778370b78457ae7bb77e35'
 review_loop_iteration: 0
 followup_review_recommended: false
@@ -11,7 +11,21 @@ context:
   - 'docs/bmad/planning-artifacts/architecture/architecture-accidentes-personales-2026-11-15/ARCHITECTURE-SPINE.md'
   - 'docs/DECISIONS.md'
 warnings: []
-deferred: []
+deferred:
+  - summary: >-
+      useAsync puede mostrar datos del id anterior un instante al cambiar el parámetro y no tiene prueba de id-change/respuesta obsoleta.
+    evidence: |-
+      Edge Case Hunter y Verification Gap; la detalle usa useAsync(() => getAccident(id), [id]); no hay prueba que cambie el id.
+    location: >-
+      frontend/src/hooks/useAsync.ts
+    severity: low
+  - summary: >-
+      La ruta /accidentes/:id no tiene prueba a nivel App.
+    evidence: |-
+      Solo se prueba la página con un Routes propio; eliminar la línea de App.tsx no rompe ninguna prueba.
+    location: >-
+      frontend/src/App.tsx
+    severity: low
 ---
 
 <intent-contract>
@@ -79,6 +93,19 @@ deferred: []
 
 ## Review Triage Log
 
+### 2026-11-15 — Review pass
+- verdicts: hallazgos de las 4 capas (11 Blind, 15 Edge, 4 Gap + 2 adicionales, informe descriptivo de Intent) agrupados por causa en filas; conteo por fila: medium 2, low 4 parcheados, 2 diferidos, resto rechazado
+- findings:
+  - `[medium]` `patch` el whitelist de 9 campos de `createAccident` y la codificación del id no tenían prueba real — se agregó `api/accidents.test.ts`
+  - `[medium]` `patch` banner de éxito no se limpiaba en un nuevo envío — `setCreadoId(null)` al inicio de `onSubmit`
+  - `[low]` `patch` errores de campo del backend persistían al editar — `set` limpia el error del campo
+  - `[low]` `patch` `d.field in VACIO` aceptaba claves heredadas (`constructor`) — `hasOwnProperty`
+  - `[low]` `patch` enlace del listado sin `encodeURIComponent`; `formatTimestamp` sin aserción — corregido y aserción agregada
+  - `[low]` `defer` `useAsync` puede mostrar datos del id anterior un instante al cambiar `:id`, sin prueba de id-change/stale — cierra con prueba de hook; severidad low
+  - `[low]` `defer` sin prueba a nivel `App` de la ruta `/accidentes/:id` — línea declarativa
+  - `[low]` `reject` 401/403 en las páginas — el 401 lo maneja globalmente `client.ts` (S3.1) y redirige; doble envío (botón deshabilitado), foco al error, aria/contraste/CSS, `Intl en-CA`, UTC en timestamps, min/max del input date, sin paginación, throw síncrono de `fn` — sin daño demostrado o complejidad desproporcionada
+  - `[false]` `reject` hallazgos de intent-alignment (jsdom vs navegador real; contrato asumido) — descriptivos; el contrato se verificó con humo real por el proxy
+
 ## Verification
 
 **Commands:**
@@ -86,3 +113,15 @@ deferred: []
 - `npm run lint:arch` -- expected: exit 0
 - `npm test` -- expected: backend y frontend en verde
 - Humo (lo corre el padre): backend + vite; por `:5173/api`: register -> login -> POST accidente -> GET lista -> GET detalle; segundo usuario recibe 404 en el detalle ajeno.
+
+## Auto Run Result
+
+Estado: done. Resumen: formulario de accidente con validación cliente espejo de DEC-007 (`accidentSchema.ts`), `details` del backend por campo, estados de carga/éxito/error; listado con vacío, carga y error con reintento; detalle con "Accidente no encontrado" en 404; etiquetas de estado centralizadas en `statusLabels.ts`.
+
+Archivos: `frontend/src/api/{types,accidentSchema,accidents}.ts`, `components/{statusLabels.ts,StatusBadge.tsx}`, `hooks/useAsync.ts`, `pages/Accident{New,List,Detail}Page.tsx`, `App.tsx`, `styles.css` y 6 archivos de prueba nuevos.
+
+Revisión: 2 medium y 4 low parcheados, 2 low diferidos, resto rechazado (ver Review Triage Log). Seguimiento recomendado: false.
+
+Verificación: build exit 0, lint:arch exit 0, backend 275 y frontend 48 pruebas verdes; humo real por el proxy de Vite: registro, login, lista vacía, POST 201, POST inválido 400 con details, lista, detalle propio 200, detalle ajeno 404. Evidencia `docs/evidence/S3.2-*.txt`.
+
+Riesgos residuales: UI no probada en navegador real; ver `deferred`.

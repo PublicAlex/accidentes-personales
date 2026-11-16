@@ -1,0 +1,8 @@
+Fecha: 2026-11-15T22:42:06-05:00
+ RUN  v5.1.0 /home/homie/Escritorio/desarrollo agentico/Carpeta sin título/backend
+ Test Files  29 passed (29)
+      Tests  275 passed (275)
+ RUN  v5.1.0 /home/homie/Escritorio/desarrollo agentico/Carpeta sin título/frontend
+ Test Files  12 passed (12)
+      Tests  48 passed (48)
+exit=0

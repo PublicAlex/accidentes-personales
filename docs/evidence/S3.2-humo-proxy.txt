@@ -1,0 +1,21 @@
+Fecha: 2026-11-15T19:35:40-05:00
+Humo S3.2 por el proxy de Vite
+register a [201]
+register b [201]
+login a [200]
+login b [200]
+--- lista vacia (a)
+[] [200]
+--- POST accidente (a)
+{"id":"a677b0c6-087c-4df0-8ec1-e211c673b0fd","affectedName":"Ana Pérez","documentType":"CC","documentNumber":"12345678","phone":"+573001234567","contactEmail":"ana@example.test","accidentType":"TRANSITO","occurredOn":"2026-11-10","place":"Calle 10 con Carrera 5","description":"Choque leve entre dos vehículos en el cruce.","status":"REGISTRADO","createdAt":"2026-11-16T00:35:41.932Z","updatedAt":"2026-11-16T00:35:41.932Z"}
+201
+--- POST invalido (descripcion corta, fecha futura)
+{"error":{"code":"VALIDATION_ERROR","message":"Datos inválidos","details":[{"field":"description","message":"El campo description debe tener entre 20 y 2000 caracteres"}]}} [400]
+--- lista (a)
+[{"id":"a677b0c6-087c-4df0-8ec1-e211c673b0fd","accidentType":"TRANSITO","occurredOn":"2026-11-10","status":"REGISTRADO"}] [200]
+--- detalle propio (a)
+{"id":"a677b0c6-087c-4df0-8ec1-e211c673b0fd","affectedName":"Ana Pérez","documentType":"CC","documentNumber":"12345678","phone":"+573001234567","contactEmail":"ana@example.test","accidentType":"TRANSITO","occurredOn":"2026-11-10","place":"Calle 10 con Carrera 5","description":"Choque leve entre dos vehículos en el cruce.","status":"REGISTRADO","createdAt":"2026-11-16T00:35:41.932Z","updatedAt":"2026-11-16T00:35:41.932Z"} [200]
+--- detalle ajeno (b)
+{"error":{"code":"NOT_FOUND","message":"Recurso no encontrado"}} [404]
+--- lista (b)
+[] [200]
