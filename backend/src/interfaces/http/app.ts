@@ -7,14 +7,16 @@ import helmet from 'helmet';
 import { NotFoundError } from '../../application/errors.js';
 import type { Logger } from '../../application/ports/Logger.js';
 import type { AuthenticateRequest } from '../../application/use-cases/auth/AuthenticateRequest.js';
+import type { AccidentUseCases } from './controllers/accidentController.js';
 import type { AuthUseCases } from './controllers/authController.js';
 import { createErrorMapper } from './errors/errorMapper.js';
 import { createAuthenticate } from './middleware/authenticate.js';
 import { createRateLimit } from './middleware/rateLimit.js';
+import { createAccidentRouter } from './routes/accidentRoutes.js';
 import { createAuthRouter } from './routes/authRoutes.js';
 
 export interface HttpAppDeps {
-  useCases: AuthUseCases & { authenticateRequest: Pick<AuthenticateRequest, 'execute'> };
+  useCases: AuthUseCases & AccidentUseCases & { authenticateRequest: Pick<AuthenticateRequest, 'execute'> };
   logger: Logger;
   config: {
     cookieSecure: boolean;
@@ -41,6 +43,7 @@ export function createHttpApp(deps: HttpAppDeps): Express {
     next();
   });
   app.use('/api/auth', createAuthRouter({ useCases, cookieSecure: config.cookieSecure, authenticate, rateLimit }));
+  app.use('/api/accidents', createAccidentRouter({ useCases, authenticate }));
   app.use('/api', (_req, _res, next) => next(new NotFoundError()));
 
   if (config.staticDir && existsSync(config.staticDir)) {
