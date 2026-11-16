@@ -48,7 +48,7 @@ development_status:
   epic-2-retrospective: optional
 
   epic-3: in-progress
-  3-1-app-react-con-landing-cuenta-y-rutas-protegidas: review
-  3-2-formulario-de-accidente-listado-y-detalle: review
-  3-3-build-de-producción-readme-y-evidencia-de-entrega: backlog
+  3-1-app-react-con-landing-cuenta-y-rutas-protegidas: done
+  3-2-formulario-de-accidente-listado-y-detalle: done
+  3-3-build-de-producción-readme-y-evidencia-de-entrega: in-progress
   epic-3-retrospective: optional
