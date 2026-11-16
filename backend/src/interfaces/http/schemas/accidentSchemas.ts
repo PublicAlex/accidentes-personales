@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { ACCIDENT_STATUSES } from '../../../domain/accident/AccidentStatus.js';
 import { ACCIDENT_TYPES } from '../../../domain/accident/AccidentType.js';
 import { DOCUMENT_TYPES } from '../../../domain/accident/DocumentType.js';
 
@@ -38,3 +39,9 @@ export const createAccidentSchema = z.strictObject({
 });
 
 export type CreateAccidentBody = z.infer<typeof createAccidentSchema>;
+
+export const changeStatusSchema = z.strictObject({
+  status: z.enum(ACCIDENT_STATUSES, { error: 'Estado fuera de catálogo' }),
+});
+
+export type ChangeStatusBody = z.infer<typeof changeStatusSchema>;

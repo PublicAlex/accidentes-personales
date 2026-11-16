@@ -3,6 +3,7 @@ import type { Logger } from '../application/ports/Logger.js';
 import type { PasswordHasher } from '../application/ports/PasswordHasher.js';
 import type { TokenRevocationRepository } from '../application/ports/TokenRevocationRepository.js';
 import type { UserRepository } from '../application/ports/UserRepository.js';
+import { ChangeAccidentStatus } from '../application/use-cases/accidents/ChangeAccidentStatus.js';
 import { CreateAccident } from '../application/use-cases/accidents/CreateAccident.js';
 import { GetMyAccident } from '../application/use-cases/accidents/GetMyAccident.js';
 import { ListMyAccidents } from '../application/use-cases/accidents/ListMyAccidents.js';
@@ -62,6 +63,7 @@ export function createContainer(env: Env, overrides: ContainerOverrides = {}): C
       createAccident: new CreateAccident(accidents, clock, ids),
       listMyAccidents: new ListMyAccidents(accidents),
       getMyAccident: new GetMyAccident(accidents),
+      changeAccidentStatus: new ChangeAccidentStatus(accidents, clock),
       authenticateRequest: new AuthenticateRequest(tokens, revocations, users),
     },
     logger,
