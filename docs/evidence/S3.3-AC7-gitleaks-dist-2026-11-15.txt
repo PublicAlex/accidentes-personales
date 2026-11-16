@@ -1,0 +1,21 @@
+# AC-7 gitleaks sobre historial completo + grep de frontend/dist - 2026-11-15 - HEAD 971f9ab
+Nota: primera ejecucion encontro 4 hallazgos (falsos positivos revisados a mano: placeholder publico de JWT_SECRET en env.ts y en el spec de S2.1, contrasena ficticia de una prueba, contrasena ficticia en la evidencia AC-9); se ignoraron por fingerprint en .gitleaksignore (commit 'chore(S3.3): ignorar por fingerprint...'). Salida de la segunda ejecucion:
+$ npm run scan:secrets
+
+> accidentes-personales@0.1.0 scan:secrets
+> node scripts/scan-secrets.mjs
+
+3:58AM INF 60 commits scanned.
+3:58AM INF scanned ~2565824 bytes (2.57 MB) in 585ms
+3:58AM INF no leaks found
+[exit 0]
+
+$ grep en frontend/dist (build del repositorio principal)
+valor de JWT_SECRET de .env: 0 coincidencias
+valor de POSTGRES_PASSWORD de .env: 0 coincidencias
+valor de REVIEWER_PASSWORD de .env: 0 coincidencias
+patron 'postgres://': 0 coincidencias
+patron 'DATABASE_URL': 0 coincidencias
+patron 'JWT_SECRET': 0 coincidencias
+patron 'password_hash': 0 coincidencias
+patron 'VITE_': 0 coincidencias
