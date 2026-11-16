@@ -2,7 +2,7 @@
 title: 'S3.1 App React con landing, cuenta y rutas protegidas'
 type: 'feature'
 created: '2026-11-15'
-status: 'in-progress'
+status: 'done'
 baseline_revision: '38b9d2713ea3217355d2ea376f18104db2dbe052'
 review_loop_iteration: 0
 followup_review_recommended: false
@@ -79,6 +79,18 @@ deferred: []
 
 ## Review Triage Log
 
+### 2026-11-15 — Review pass
+- verdicts: hallazgos de las 4 capas (13 Blind, 14 Edge, 2 Gap + 2 adicionales, informe descriptivo de Intent) agrupados por causa en 8 filas — medium 2, low 2 parcheados, low rechazados, false 2 (conteo por fila, no por hallazgo individual)
+- findings:
+  - `[medium]` `patch` RegisterPage sin pruebas (validación, 409 genérico, 400 details, 429, éxito, login posterior fallido) — se agregó `RegisterPage.test.tsx` (6 pruebas)
+  - `[medium]` `patch` 401 mid-sesión y logout con red caída sin prueba — se agregó `Layout.test.tsx` (2 pruebas)
+  - `[low]` `patch` logout navegaba tras limpiar estado (carrera con RequireAuth) — `navigate('/')` antes de `logout()`
+  - `[low]` `patch` `from` sin validar y sin query/hash — `LoginPage` exige string que empiece por `/` (no `//`); `RequireAuth` conserva search y hash
+  - `[low]` `reject` `register` del contexto sin usar / flujo duplicado — la página necesita distinguir fallo de registro vs. de login; riesgo de divergencia bajo
+  - `[low]` `reject` getMe tardío pisa login, getMe con 5xx tratado como anónimo, JSON no válido en 2xx, login con campos vacíos, landing ignora sesión, a11y (aria-invalid, foco), contraste, CSRF — no ocurren en uso normal o añaden complejidad sin daño demostrado; CSRF mitigado por cookie sameSite=lax (DEC-005)
+  - `[false]` `reject` proxy de Vite no está en el diff — ya existe en `vite.config.ts`; dependencias ausentes del diff — instaladas en el commit chore previo
+  - `[false]` `reject` hallazgos de intent-alignment descriptivos (jsdom vs navegador) — son lectura, no defectos; la UI en navegador real no se probó (pendiente declarado)
+
 ## Verification
 
 **Commands:**
@@ -86,3 +98,15 @@ deferred: []
 - `npm run lint:arch` -- expected: exit 0
 - `npm test` -- expected: backend y frontend en verde
 - Humo: backend (`npm run dev:backend`) + `npm run dev:frontend`; con `curl -c/-b` a `http://localhost:5173/api/...`: register -> login -> me; guardado en `docs/evidence/S3.1-humo-proxy.txt`
+
+## Auto Run Result
+
+Estado: done. Resumen: SPA React 18 + Vite + TS con landing, registro (con login automático), login, logout, rutas protegidas (`RequireAuth`), 404, adaptador HTTP único `src/api/` y proxy `/api`. Placeholders protegidos de accidentes para S3.2.
+
+Archivos: `frontend/src/api/{client,auth,types}.ts` (adaptador), `hooks/useAuth.tsx`, `components/{RequireAuth,Layout,FieldError}.tsx`, `pages/{Landing,Login,Register,AccidentNew,AccidentList,NotFound}Page.tsx`, `App.tsx`, `main.tsx`, `styles.css`, `vitest.config.ts`, `test-setup.ts` y 6 archivos de prueba.
+
+Revisión: 2 parches medium (pruebas de Register y de Layout/401), 2 low (orden de logout, validación de `from`); rechazados: ver Review Triage Log; diferidos: ninguno. Seguimiento recomendado: false.
+
+Verificación: build exit 0, lint:arch exit 0, backend 275 pruebas y frontend 21 pruebas verdes; humo por el proxy de Vite (me 401, register 201, login 200, me 200, logout 204, me 401). Evidencia en `docs/evidence/S3.1-*.txt`.
+
+Riesgos residuales: la UI no se probó en navegador real (solo jsdom + curl por el proxy).

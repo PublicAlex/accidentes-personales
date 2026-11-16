@@ -1,0 +1,17 @@
+Fecha: 2026-11-15T19:29:25-05:00
+
+vite v8.3.8 building client environment for production...
+transforming...
+✓ 34 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.40 kB │ gzip:  0.27 kB
+dist/assets/index-BNeYCEKs.css    1.25 kB │ gzip:  0.57 kB
+dist/assets/index-CrkuCBmk.js   188.24 kB │ gzip: 61.89 kB
+
+✓ built in 241ms
+
+> backend@0.1.0 build
+> tsc -p tsconfig.build.json
+
+exit=0

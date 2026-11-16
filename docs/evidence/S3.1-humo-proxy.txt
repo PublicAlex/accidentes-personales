@@ -1,0 +1,18 @@
+Fecha: 2026-11-15T19:25:36-05:00
+Humo a traves del proxy de Vite (:5173 -> :3000)
+--- GET / (SPA)
+200 text/html
+--- GET /api/auth/me sin sesion
+{"error":{"code":"UNAUTHENTICATED","message":"No autenticado"}} [401]
+--- POST /api/auth/register
+{"id":"d2af169b-2711-417a-a358-564a9022b990","email":"humo1794788736@example.test","fullName":"Usuario Humo","role":"USER"} [201]
+--- POST /api/auth/login (mala clave)
+{"error":{"code":"UNAUTHENTICATED","message":"Credenciales inválidas"}} [401]
+--- POST /api/auth/login
+{"id":"d2af169b-2711-417a-a358-564a9022b990","email":"humo1794788736@example.test","fullName":"Usuario Humo","role":"USER"} [200]
+--- GET /api/auth/me con sesion
+{"id":"d2af169b-2711-417a-a358-564a9022b990","email":"humo1794788736@example.test","fullName":"Usuario Humo","role":"USER"} [200]
+--- POST /api/auth/logout
+ [204]
+--- GET /api/auth/me tras logout
+{"error":{"code":"UNAUTHENTICATED","message":"No autenticado"}} [401]
