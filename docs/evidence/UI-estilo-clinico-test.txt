@@ -1,0 +1,34 @@
+# Fecha: 2026-11-17 — npm test con Postgres (docker compose up -d db) (rama feat/ui-estilo-clinico)
+
+> accidentes-personales@0.1.0 test
+> npm test -w backend && npm test -w frontend
+
+
+> backend@0.1.0 test
+> vitest run
+
+
+ RUN  v5.1.0 /home/homie/Escritorio/desarrollo agentico/Carpeta sin título/backend
+
+
+ Test Files  30 passed (30)
+      Tests  281 passed (281)
+   Start at  18:01:55
+   Duration  79.43s (tests 88%, import 9%, transform 3%)
+
+    Isolate  30 workers spawned · ~221ms startup each (spawn + environment, per file)
+             at least ~6.40s faster with isolate: false — reuses workers across files instead of one per file
+
+
+> frontend@0.1.0 test
+> vitest run --passWithNoTests
+
+
+ RUN  v5.1.0 /home/homie/Escritorio/desarrollo agentico/Carpeta sin título/frontend
+
+
+ Test Files  12 passed (12)
+      Tests  48 passed (48)
+   Start at  18:03:16
+   Duration  3.12s (environment 72%, setup 12%, tests 9%, transform 5%, import 2%)
+
