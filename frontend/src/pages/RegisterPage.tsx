@@ -72,31 +72,34 @@ export function RegisterPage() {
 
   return (
     <main className="container narrow">
+      <div className="card auth-card">
       <h1>Crear cuenta</h1>
+      <p className="muted">Crea tu cuenta para registrar y consultar tus accidentes.</p>
       <form onSubmit={onSubmit} noValidate>
         <div className="field">
-          <label htmlFor="fullName">Nombre completo</label>
+          <label htmlFor="fullName" className="required">Nombre completo</label>
           <input id="fullName" autoComplete="name" value={fullName} onChange={(e) => setFullName(e.target.value)} aria-describedby="fullName-error" />
           <FieldError id="fullName-error" message={errors.fullName} />
         </div>
         <div className="field">
-          <label htmlFor="email">Correo electrónico</label>
+          <label htmlFor="email" className="required">Correo electrónico</label>
           <input id="email" type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} aria-describedby="email-error" />
           <FieldError id="email-error" message={errors.email} />
         </div>
         <div className="field">
-          <label htmlFor="password">Contraseña</label>
+          <label htmlFor="password" className="required">Contraseña</label>
           <input id="password" type="password" autoComplete="new-password" value={password} onChange={(e) => setPassword(e.target.value)} aria-describedby="password-error" />
           <FieldError id="password-error" message={errors.password} />
         </div>
         {general && (
-          <p role="alert" className="field-error">
+          <p role="alert" className="alert alert-error">
             {general} {loginFallido && <Link to="/login">Ir a ingresar</Link>}
           </p>
         )}
-        <button type="submit" disabled={enviando}>{enviando ? 'Creando cuenta...' : 'Registrarme'}</button>
+        <button type="submit" className="btn-block" disabled={enviando} aria-busy={enviando || undefined}>{enviando ? 'Creando cuenta...' : 'Registrarme'}</button>
       </form>
-      <p>¿Ya tienes cuenta? <Link to="/login">Ingresar</Link></p>
+      <p className="auth-alt">¿Ya tienes cuenta? <Link to="/login">Ingresar</Link></p>
+      </div>
     </main>
   );
 }

@@ -40,20 +40,23 @@ export function LoginPage() {
 
   return (
     <main className="container narrow">
+      <div className="card auth-card">
       <h1>Ingresar</h1>
+      <p className="muted">Accede para consultar tus accidentes registrados.</p>
       <form onSubmit={onSubmit} noValidate>
         <div className="field">
-          <label htmlFor="email">Correo electrónico</label>
+          <label htmlFor="email" className="required">Correo electrónico</label>
           <input id="email" type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
         </div>
         <div className="field">
-          <label htmlFor="password">Contraseña</label>
+          <label htmlFor="password" className="required">Contraseña</label>
           <input id="password" type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} required />
         </div>
-        {error && <p role="alert" className="field-error">{error}</p>}
-        <button type="submit" disabled={enviando}>{enviando ? 'Ingresando...' : 'Ingresar'}</button>
+        {error && <p role="alert" className="alert alert-error">{error}</p>}
+        <button type="submit" className="btn-block" disabled={enviando} aria-busy={enviando || undefined}>{enviando ? 'Ingresando...' : 'Ingresar'}</button>
       </form>
-      <p>¿No tienes cuenta? <Link to="/registro">Regístrate</Link></p>
+      <p className="auth-alt">¿No tienes cuenta? <Link to="/registro">Regístrate</Link></p>
+      </div>
     </main>
   );
 }
