@@ -151,3 +151,10 @@ Origen: `docs/bmad/planning-artifacts/architecture/architecture-accidentes-perso
      - Node-Boilerplate: MPL-2.0. No se usó su código, así que no aplica.
      - Se actualizó `SOURCES.md`.
   3. **`npm audit`.** Las 3 vulnerabilidades moderadas vienen de la cadena transitiva de `node-pg-migrate` y no se alcanzan desde el servidor HTTP. Se acepta y se documenta en `LIMITATIONS.md`.
+
+### DEC-021 — Mensaje explícito para un email ya registrado (reemplaza parte de DEC-012)
+- Fecha: 2026-11-17
+- Tipo: decisión de producto (humana), tras probar la app manualmente.
+- Contexto: al registrarse con un email ya usado, el mensaje genérico ("No se pudo completar el registro") resultaba confuso.
+- Decisión: el backend responde 409 `EMAIL_TAKEN` con el mensaje "Este email ya está registrado", y el frontend muestra ese mismo texto.
+- Riesgo aceptado: permite averiguar si un email tiene cuenta. Se mitiga con el rate limit de `/api/auth/register` (DEC-012). El login mantiene su mensaje genérico ("credenciales inválidas"). Se documenta en `LIMITATIONS.md`.

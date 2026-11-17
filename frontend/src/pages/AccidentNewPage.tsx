@@ -9,6 +9,7 @@ import {
   type AccidentFormValues,
 } from '../api/accidentSchema';
 import { ACCIDENT_TYPES, DOCUMENT_TYPES, type CreateAccidentInput } from '../api/types';
+import { Icon } from '../components/Icon';
 import { FieldError } from '../components/FieldError';
 
 const VACIO: AccidentFormValues = {
@@ -90,13 +91,14 @@ export function AccidentNewPage() {
   function campo(id: keyof AccidentFormValues, label: string, extra: { type?: string; autoComplete?: string } = {}) {
     return (
       <div className="field">
-        <label htmlFor={id}>{label}</label>
+        <label htmlFor={id} className="required">{label}</label>
         <input
           id={id}
           type={extra.type}
           autoComplete={extra.autoComplete}
           value={values[id]}
           onChange={(e) => set(id, e.target.value)}
+          aria-required="true"
           aria-invalid={errors[id] ? true : undefined}
           aria-describedby={`${id}-error`}
         />
@@ -106,17 +108,22 @@ export function AccidentNewPage() {
   }
 
   return (
-    <section className="narrow-form">
+    <section className="form-page">
       <h1>Registrar accidente</h1>
       {creadoId && (
-        <p role="status" className="success">
-          Accidente registrado correctamente. <Link to={`/accidentes/${creadoId}`}>Ver detalle</Link>
+        <p role="status" className="alert alert-success">
+          <Icon name="check" />
+          <span>Accidente registrado correctamente.</span> <Link to={`/accidentes/${creadoId}`}>Ver detalle</Link>
         </p>
       )}
-      <form onSubmit={onSubmit} noValidate>
+      <form onSubmit={onSubmit} noValidate className="card form-card">
+        <p className="muted form-hint">Los campos marcados con * son obligatorios.</p>
+        <fieldset>
+          <legend>Datos del afectado</legend>
+          <div className="grid-2">
         {campo('affectedName', 'Nombre del afectado')}
         <div className="field">
-          <label htmlFor="documentType">Tipo de documento</label>
+          <label htmlFor="documentType" className="required">Tipo de documento</label>
           <select
             id="documentType"
             value={values.documentType}
@@ -132,10 +139,20 @@ export function AccidentNewPage() {
           <FieldError id="documentType-error" message={errors.documentType} />
         </div>
         {campo('documentNumber', 'Número de documento')}
+          </div>
+        </fieldset>
+        <fieldset>
+          <legend>Contacto</legend>
+          <div className="grid-2">
         {campo('phone', 'Teléfono', { type: 'tel', autoComplete: 'tel' })}
         {campo('contactEmail', 'Correo de contacto', { type: 'email', autoComplete: 'email' })}
+          </div>
+        </fieldset>
+        <fieldset>
+          <legend>Detalles del accidente</legend>
+          <div className="grid-2">
         <div className="field">
-          <label htmlFor="accidentType">Tipo de accidente</label>
+          <label htmlFor="accidentType" className="required">Tipo de accidente</label>
           <select
             id="accidentType"
             value={values.accidentType}
@@ -152,8 +169,8 @@ export function AccidentNewPage() {
         </div>
         {campo('occurredOn', 'Fecha del accidente', { type: 'date' })}
         {campo('place', 'Lugar')}
-        <div className="field">
-          <label htmlFor="description">Descripción</label>
+        <div className="field field-full">
+          <label htmlFor="description" className="required">Descripción</label>
           <textarea
             id="description"
             rows={5}
@@ -164,10 +181,12 @@ export function AccidentNewPage() {
           />
           <FieldError id="description-error" message={errors.description} />
         </div>
+          </div>
+        </fieldset>
         {general && (
-          <p role="alert" className="field-error">{general}</p>
+          <p role="alert" className="alert alert-error">{general}</p>
         )}
-        <button type="submit" disabled={enviando}>{enviando ? 'Enviando...' : 'Registrar accidente'}</button>
+        <button type="submit" disabled={enviando} aria-busy={enviando || undefined}>{enviando ? 'Enviando...' : 'Registrar accidente'}</button>
       </form>
     </section>
   );

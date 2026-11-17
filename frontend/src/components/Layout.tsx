@@ -1,36 +1,25 @@
-import { useState } from 'react';
-import { Link, Outlet, useNavigate } from 'react-router-dom';
-import { useAuth } from '../hooks/useAuth';
+import { Outlet } from 'react-router-dom';
+import { SiteFooter, SiteHeader } from './SiteHeader';
 
 export function Layout() {
-  const { user, logout } = useAuth();
-  const navigate = useNavigate();
-  const [saliendo, setSaliendo] = useState(false);
-
-  async function salir() {
-    setSaliendo(true);
-    navigate('/');
-    await logout();
-  }
-
   return (
-    <>
-      <header className="site-header">
-        <Link to="/" className="brand">Accidentes personales</Link>
-        <nav aria-label="Principal">
-          <Link to="/accidentes">Mis accidentes</Link>
-          <Link to="/accidentes/nuevo">Registrar accidente</Link>
-        </nav>
-        <span className="user">
-          {user?.fullName}{' '}
-          <button type="button" onClick={salir} disabled={saliendo}>
-            {saliendo ? 'Saliendo...' : 'Salir'}
-          </button>
-        </span>
-      </header>
+    <div className="app-shell">
+      <SiteHeader />
       <main className="container">
         <Outlet />
       </main>
-    </>
+      <SiteFooter />
+    </div>
+  );
+}
+
+// Envoltorio de las páginas públicas (landing, login, registro, 404): sus páginas traen su propio <main>.
+export function PublicLayout() {
+  return (
+    <div className="app-shell">
+      <SiteHeader />
+      <Outlet />
+      <SiteFooter />
+    </div>
   );
 }

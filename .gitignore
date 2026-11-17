@@ -28,3 +28,6 @@ _bmad/custom/*.user.toml
 .DS_Store
 .vscode/
 .idea/
+
+# Cookie jar del ejemplo curl del README
+jar.txt

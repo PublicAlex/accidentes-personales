@@ -41,7 +41,7 @@ describe('Layout y sesión', () => {
   it('logout aunque falle la red limpia la sesión y vuelve a la landing', async () => {
     vi.mocked(logoutUser).mockRejectedValue(new ApiError(0, 'NETWORK_ERROR', 'x'));
     montar();
-    fireEvent.click(await screen.findByRole('button', { name: 'Salir' }));
+    fireEvent.click(await screen.findByRole('button', { name: 'Cerrar sesión' }));
     expect(await screen.findByText('Landing')).toBeTruthy();
   });
 

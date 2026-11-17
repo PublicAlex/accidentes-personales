@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import { getAccident } from '../api/accidents';
 import { accidentTypeLabels, documentTypeLabels, formatDate } from '../api/accidentSchema';
 import { ApiError } from '../api/client';
+import { Icon } from '../components/Icon';
 import { StatusBadge } from '../components/StatusBadge';
 import { useAsync } from '../hooks/useAsync';
 
@@ -20,7 +21,8 @@ export function AccidentDetailPage() {
   if (error != null) {
     if (error instanceof ApiError && error.status === 404) {
       return (
-        <section>
+        <section className="card empty-state">
+          <span className="empty-icon"><Icon name="alert" size={28} /></span>
           <h1>Accidente no encontrado</h1>
           <p><Link to="/accidentes">Volver a mis accidentes</Link></p>
         </section>
@@ -29,9 +31,9 @@ export function AccidentDetailPage() {
     return (
       <section>
         <h1>Detalle del accidente</h1>
-        <div role="alert" className="field-error">
+        <div role="alert" className="alert alert-error">
           <p>{error instanceof ApiError && error.status === 0 ? 'No se pudo conectar con el servidor.' : 'No se pudo cargar el accidente.'}</p>
-          <button type="button" onClick={reload}>Reintentar</button>
+          <button type="button" className="btn-outline btn-sm" onClick={reload}>Reintentar</button>
         </div>
         <p><Link to="/accidentes">Volver a mis accidentes</Link></p>
       </section>
@@ -40,7 +42,6 @@ export function AccidentDetailPage() {
 
   if (!data) return null;
   const filas: [string, ReactNode][] = [
-    ['Estado', <StatusBadge key="s" status={data.status} />],
     ['Nombre del afectado', data.affectedName],
     ['Tipo de documento', documentTypeLabels[data.documentType] ?? data.documentType],
     ['Número de documento', data.documentNumber],
@@ -50,21 +51,38 @@ export function AccidentDetailPage() {
     ['Fecha del accidente', formatDate(data.occurredOn)],
     ['Lugar', data.place],
     ['Descripción', data.description],
-    ['Registrado el', formatTimestamp(data.createdAt)],
-    ['Última actualización', formatTimestamp(data.updatedAt)],
   ];
+  const corto = data.id.slice(0, 8).toUpperCase();
   return (
     <section>
-      <h1>Detalle del accidente</h1>
-      <dl className="detail">
-        {filas.map(([k, v]) => (
-          <div key={k} className="detail-row">
-            <dt>{k}</dt>
-            <dd>{v}</dd>
+      <p className="back"><Link to="/accidentes">Volver a mis accidentes</Link></p>
+      <article className="card ficha">
+        <header className="ficha-head">
+          <div>
+            <h1>Detalle del accidente</h1>
+            <p className="muted">Caso <span className="case-id">#{corto}</span></p>
           </div>
-        ))}
-      </dl>
-      <p><Link to="/accidentes">Volver a mis accidentes</Link></p>
+          <StatusBadge status={data.status} />
+        </header>
+        <dl className="detail">
+          {filas.map(([k, v]) => (
+            <div key={k} className={`detail-row${k === 'Descripción' ? ' detail-wide' : ''}`}>
+              <dt>{k}</dt>
+              <dd>{v}</dd>
+            </div>
+          ))}
+        </dl>
+        <ol className="timeline" aria-label="Seguimiento">
+          <li>
+            <span className="timeline-label">Registrado el</span>
+            <span className="timeline-value">{formatTimestamp(data.createdAt)}</span>
+          </li>
+          <li>
+            <span className="timeline-label">Última actualización</span>
+            <span className="timeline-value">{formatTimestamp(data.updatedAt)}</span>
+          </li>
+        </ol>
+      </article>
     </section>
   );
 }

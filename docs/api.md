@@ -69,7 +69,7 @@ Las longitudes se cuentan en code points y los textos se recortan. El propietari
 | 401 | `UNAUTHENTICATED` | sin sesión, token inválido/expirado/revocado, credenciales de login erróneas (mensaje único) |
 | 403 | `FORBIDDEN` | rol insuficiente |
 | 404 | `NOT_FOUND` | recurso ajeno, inexistente o id no UUID; también ruta `/api` desconocida y cualquier método no GET fuera de `/api` (un GET fuera de `/api` devuelve `index.html` si existe `frontend/dist`, incluso para archivos inexistentes; sin `dist`, 404 JSON) |
-| 409 | `EMAIL_TAKEN` | email ya registrado (mensaje genérico) |
+| 409 | `EMAIL_TAKEN` | "Este email ya está registrado" (DEC-021) |
 | 409 | `INVALID_TRANSITION` | transición de estado no permitida |
 | 409 | `CONCURRENT_UPDATE` | el estado cambió durante la operación |
 | 413 | `PAYLOAD_TOO_LARGE` | cuerpo > 100 kb |

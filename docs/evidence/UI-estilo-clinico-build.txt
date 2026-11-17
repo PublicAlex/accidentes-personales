@@ -1,0 +1,23 @@
+# Fecha: 2026-11-17 — build (rama feat/ui-estilo-clinico)
+
+> accidentes-personales@0.1.0 build
+> npm run build -w frontend && npm run build -w backend
+
+
+> frontend@0.1.0 build
+> tsc --noEmit && vite build
+
+vite v8.3.8 building client environment for production...
+transforming...
+✓ 43 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.41 kB │ gzip:  0.28 kB
+dist/assets/index-BPSQ54EP.css   10.91 kB │ gzip:  2.95 kB
+dist/assets/index-Bml935Dd.js   203.83 kB │ gzip: 66.15 kB
+
+✓ built in 540ms
+
+> backend@0.1.0 build
+> tsc -p tsconfig.build.json
+

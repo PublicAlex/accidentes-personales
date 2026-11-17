@@ -52,13 +52,12 @@ describe('RegisterPage', () => {
     expect(registerUser).not.toHaveBeenCalled();
   });
 
-  it('409 muestra mensaje genérico sin afirmar que el correo existe', async () => {
+  it('409 informa que el email ya está registrado (DEC-021)', async () => {
     vi.mocked(registerUser).mockRejectedValue(new ApiError(409, 'EMAIL_TAKEN', 'x'));
     montar();
     await llenar();
     const alerta = (await screen.findByRole('alert')).textContent ?? '';
-    expect(alerta).toContain('No se pudo completar el registro');
-    expect(alerta.toLowerCase()).not.toContain('ya está registrado');
+    expect(alerta).toContain('Este email ya está registrado');
   });
 
   it('400 con details pinta el error en su campo', async () => {
