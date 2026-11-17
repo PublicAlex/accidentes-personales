@@ -41,6 +41,7 @@ describe('registro', () => {
     const res = await request(app).post('/api/auth/register').send({ ...validUser, email: 'ANA@EXAMPLE.TEST' });
     expect(res.status).toBe(409);
     expect(res.body.error.code).toBe('EMAIL_TAKEN');
+    expect(res.body.error.message).toBe('Este email ya está registrado');
   });
 
   it.each([

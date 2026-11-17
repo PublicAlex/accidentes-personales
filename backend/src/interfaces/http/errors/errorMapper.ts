@@ -28,7 +28,7 @@ function zodDetails(err: ZodError): Detail[] {
 }
 
 const CONFLICT_STATUS_MESSAGES: Record<string, string> = {
-  EMAIL_TAKEN: 'No se pudo completar el registro',
+  EMAIL_TAKEN: 'Este email ya está registrado',
   CONCURRENT_UPDATE: 'El recurso cambió; vuelve a consultarlo',
 };
 

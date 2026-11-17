@@ -45,7 +45,7 @@ export function RegisterPage() {
     } catch (err) {
       setEnviando(false);
       if (err instanceof ApiError && err.status === 409) {
-        setGeneral('No se pudo completar el registro. Verifica tus datos o intenta ingresar.');
+        setGeneral('Este email ya está registrado');
       } else if (err instanceof ApiError && err.status === 400) {
         const porCampo: Errors = {};
         for (const d of err.details ?? []) porCampo[d.field] = d.message;

@@ -36,3 +36,6 @@ Las licencias de varias fuentes no se pudieron verificar localmente; ver `docs/S
 - 3 vulnerabilidades moderadas, todas en `glob`/`minimatch`, dependencias transitivas de `node-pg-migrate@9.0.0`. Una es GHSA-g3hv-75wg-m249, un DoS por patrones glob.
 - Impacto: solo afecta a la herramienta de migraciones, que se ejecuta a mano con patrones fijos del repositorio. Ese código no corre en el servidor HTTP ni recibe entradas de usuarios.
 - Decisión: se acepta en el MVP. La corrección que propone `npm audit fix --force` implica un cambio mayor; queda pendiente actualizar cuando `node-pg-migrate` publique una versión corregida.
+
+## Enumeración de cuentas en el registro (DEC-021)
+- El registro responde "Este email ya está registrado". Se eligió por claridad para el usuario. El rate limit de `/api/auth/register` lo mitiga, y el login no revela si una cuenta existe.
